@@ -7,15 +7,20 @@
  * Theming mirrors Track Record exactly: body.light / body.dirt carry the
  * same tokens and values as the app's style.css. Preference order:
  *   1. the hub's own stored choice (localStorage "carotene-hub-theme"),
- *   2. Track Record's stored choice ("trackrecord-settings-v1", same
- *      origin) when the visitor has already picked one there,
+ *   2. Track Record's stored choice — the "mylist" snapshot it keeps in this
+ *      same origin, under state.settings — when the visitor has already
+ *      picked a theme there,
  *   3. the system prefers-color-scheme.
  * ------------------------------------------------------------------ */
 (function () {
   'use strict';
 
   var LS_KEY = 'carotene-hub-theme';
-  var TR_KEY = 'trackrecord-settings-v1';
+  // Track Record persists its ENTIRE state as one snapshot under this key
+  // (core.js saveState -> localStorage.setItem('mylist', JSON.stringify(state))),
+  // where state is { myList, settings: { lightMode, colorTheme, ... } }. The
+  // theme is therefore two levels down, not a flat { lightMode }.
+  var TR_KEY = 'mylist';
 
   function readTheme() {
     try {
@@ -26,7 +31,8 @@
       }
     } catch (e) { /* storage unavailable: fall through */ }
     try {
-      var tr = JSON.parse(localStorage.getItem(TR_KEY) || 'null');
+      var snap = JSON.parse(localStorage.getItem(TR_KEY) || 'null');
+      var tr = snap && snap.settings;
       if (tr && typeof tr.lightMode === 'boolean') {
         return { light: tr.lightMode, dirt: tr.colorTheme === 'dirt' };
       }
@@ -127,8 +133,13 @@
     about.classList.remove('show');
     document.body.classList.remove('modal-open');
     setPageInert(false);
-    if (opener && opener.isConnected && !opener.closest('[inert]')) opener.focus();
-    else if (aboutLink) aboutLink.focus();
+    // When the modal was opened from a deep link there is no focused opener:
+    // document.activeElement is body, which is truthy and connected but
+    // cannot take focus, so the fallback has to kick in or a keyboard user is
+    // dumped at the top of the document. Same guard as settings.js closeModal.
+    var target = (opener && opener !== document.body && opener.isConnected &&
+      !opener.closest('[inert]')) ? opener : aboutLink;
+    if (target) target.focus();
   }
 
   if (aboutLink) {

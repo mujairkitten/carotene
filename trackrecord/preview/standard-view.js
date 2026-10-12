@@ -72,7 +72,7 @@ export function renderDatabase() {
         <div class="db-name">${escapeHtml(d.name)}</div>
       </div>
       ${aptGroupsHtml(d.apt)}
-      <button class="btn small add-btn" data-add="${realIndex}" aria-label="Add ${escapeAttr(d.name)} to my list" ${already ? 'disabled' : ''}>${already ? '✓ In my list' : '+ Add to my list'}</button>
+      <button class="btn small add-btn" data-add="${realIndex}" aria-label="${already ? 'In my list' : 'Add to my list'}: ${escapeAttr(d.name)}" ${already ? 'disabled' : ''}>${already ? '✓ In my list' : '+ Add to my list'}</button>
     </div>`;
   }).join("");
   }

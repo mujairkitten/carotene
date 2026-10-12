@@ -138,13 +138,14 @@ jobs:
 
           # ---- Carotene hub (site root) ----
           # The landing page, its stylesheet, its theme/modal script and its
-          # own favicon. hub.js is a classic script (no imports): never
-          # minified as a module.
+          # own favicon. hub.js is a classic script (no imports), so it is
+          # minified plainly - never with --module - exactly like the vendored
+          # kao-banner.js below. node --check then validates the shipped file.
           mkdir -p deploy
           cp index.html deploy/
           cp favicon.svg deploy/
-          cp hub.js deploy/
           "$CSSO" style.css -o deploy/style.css
+          "$TERSER" hub.js -c passes=3 -m -o deploy/hub.js
           node --check deploy/hub.js
 
           # ---- Track Record ----

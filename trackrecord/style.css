@@ -1970,6 +1970,12 @@ body.light .cal-race-add-btn:hover {
   position: fixed;
   inset: 0;
   background: rgba(5, 6, 9, .6);
+  /* Blur the page behind the dialog, so it matches the Carotene hub's About
+     popup. Purely an enhancement over the scrim above, which already dims on
+     its own — so unlike .modal-box this needs no @supports fallback: where
+     backdrop-filter is unsupported the dialog just reads a little crisper. */
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
   z-index: 200;
   align-items: center;
   justify-content: center;
@@ -2317,21 +2323,24 @@ body.light .cal-race-add-btn:hover {
     transform: translateX(0) scale(1);
   }
   /* The rail button sits ~36px off the bottom edge, so centring a tall panel
-     on it always overhung the viewport. Anchoring the panel's BOTTOM to the
-     button's midline makes it grow upward instead, which stays on screen at
-     any viewport height. */
+     on it always overhung the viewport. Anchoring the panel's BOTTOM means it
+     grows upward instead, which stays on screen at any viewport height.
+     The anchor is the button's bottom edge rather than its midline: the
+     button is 42px tall and centred in a wrap with 4px padding + 1px border,
+     so its bottom sits 5px above the wrap's border-box bottom, and 4px above
+     the padding-box bottom that `bottom` is measured from. */
   body.nav-right .carotene-panel {
     right: calc(100% + 8px);
-    bottom: auto;
-    top: 50%;
-    transform: translateY(-100%);
+    bottom: 4px;
+    top: auto;
+    transform: none;
   }
   body.nav-left .carotene-panel {
     left: calc(100% + 8px);
     right: auto;
-    bottom: auto;
-    top: 50%;
-    transform: translateY(-100%);
+    bottom: 4px;
+    top: auto;
+    transform: none;
   }
   body.nav-left {
     padding-right: 0;

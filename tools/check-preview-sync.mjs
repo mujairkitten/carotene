@@ -39,12 +39,12 @@ function normalize(text, isPreview) {
       .replaceAll('../icons/', './icons/')
       .replaceAll('href="../../"', 'href="../"');
   }
-  // Build tag: console.info('build v5.0.2'); vs console.info('[preview] build v5.1-beta1.5');
+  // Build tag: console.info('build v5.0.2'); vs console.info('[preview] build v5.1-beta1.7');
   out = out.replace(
     /console\.info\('.*?build .*?'\);/g,
     "console.info('BUILD_TAG');"
   );
-  // Version badge: <strong>v5.0.2</strong> vs <strong>v5.1-beta1.5</strong>.
+  // Version badge: <strong>v5.0.2</strong> vs <strong>v5.1-beta1.7</strong>.
   out = out.replace(
     /<div class="version-item"><span>Version<\/span><strong>.*?<\/strong><\/div>/g,
     '<div class="version-item"><span>Version</span><strong>VERSION</strong></div>'

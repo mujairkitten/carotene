@@ -31,6 +31,16 @@
   --accent2-rgb: 43, 207, 168;
   --carrot: #e8873a;
   --carrot-leaf: #22b573;
+
+  /* Glass surfaces, verbatim from the shared kit (the sample page and Track
+     Record). The hub had no glass before, so these are new here; the About
+     popup now uses them the same way .modal-box does. */
+  --glass-bg: rgba(23, 26, 34, .72);
+  --glass-bg-soft: rgba(23, 26, 34, .65);
+  --glass-border: rgba(255, 255, 255, .09);
+  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, .06);
+  --faux-glass-bg: rgba(23, 26, 34, .86);
+  --faux-glass-card-bg: rgba(23, 26, 34, .86);
 }
 
 /* Light theme: same tokens as Track Record's body.light. Applied by hub.js,
@@ -52,6 +62,14 @@ body.light {
   --accent2-rgb: 24, 117, 96;
   --carrot: #c2651c;
   --carrot-leaf: #187a4d;
+
+  /* Light glass reads as solid panels rather than translucency. */
+  --glass-bg: var(--bg-alt);
+  --glass-bg-soft: var(--panel);
+  --glass-border: var(--line);
+  --glass-highlight: none;
+  --faux-glass-bg: var(--panel-2);
+  --faux-glass-card-bg: var(--panel);
 }
 
 /* Dirt theme: same tokens as Track Record's body.dirt. */
@@ -145,10 +163,8 @@ body {
 }
 
 /* A drawn dot rather than the "·" character, so it can be sized and centred
-   independently of the font's own middot metrics. Shared with the About card
-   so the two separators can never drift apart. */
-.rail-dot,
-.about-dot {
+   independently of the font's own middot metrics. */
+.rail-dot {
   flex: 0 0 auto;
   width: 4px;
   height: 4px;
@@ -166,9 +182,11 @@ body {
   width: 1.9rem;
   height: 1.9rem;
   padding: 0;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  background: none;
+  /* Button surface from the kit's .icon-pill-btn, squared off to sit inline
+     with the About link. */
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel-2);
   color: var(--ink-dim);
   cursor: pointer;
   transition: background .15s ease, color .15s ease, border-color .15s ease;
@@ -181,9 +199,9 @@ body {
 }
 
 .rail-toggle:hover {
-  background: var(--panel-2);
+  background: var(--panel);
   color: var(--ink);
-  border-color: var(--line-soft);
+  border-color: var(--accent-dim);
 }
 
 .rail-toggle:focus-visible {
@@ -211,8 +229,10 @@ body {
      taller than the viewport - align-items: center would cut off the top. */
   overflow-y: auto;
   padding: clamp(1rem, 4vw, 2.5rem);
-  background: rgb(0 0 0 / .55);
+  /* Scrim from the kit's .modal-overlay, so the popup dims identically. */
+  background: rgba(5, 6, 9, .6);
   backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 
 /* Stop the page behind scrolling under the overlay. */
@@ -223,11 +243,18 @@ body.modal-open {
 .about-card {
   flex: 0 0 auto;
   margin: auto;                       /* centres on both axes */
-  width: min(100%, 40rem);
-  padding: 1.5rem 1.6rem 1.6rem;
-  border: 1px solid var(--line);
+  width: min(100%, 35rem);
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 1.5rem;
+  /* Surfaces copied from the kit's .about-modal: glass fill, accent-tinted
+     edge, and the same two-layer shadow. */
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, var(--glass-border));
   border-radius: 16px;
-  background: var(--panel);
+  box-shadow: var(--glass-highlight), 0 24px 60px rgba(0, 0, 0, .52), 0 0 28px rgba(var(--accent-rgb), .16);
 }
 
 .about-head {
@@ -235,11 +262,12 @@ body.modal-open {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  margin-bottom: 12px;
 }
 
 .about-title {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 16px;
   font-weight: 700;
   color: var(--ink);
 }
@@ -248,23 +276,24 @@ body.modal-open {
   flex: 0 0 auto;
   display: grid;
   place-items: center;
-  width: 1.9rem;
-  height: 1.9rem;
+  width: 1.75rem;
+  height: 1.75rem;
   padding: 0;
-  border: none;
-  border-radius: 8px;
-  background: none;
+  /* Pill surface from the kit's .modal-close. */
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel-2);
   font-family: inherit;
-  font-size: 1.25rem;
+  font-size: .8125rem;
   line-height: 1;
   color: var(--ink-dim);
   cursor: pointer;
-  transition: background .15s ease, color .15s ease;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
 }
 
 .about-close:hover {
-  background: var(--panel-2);
   color: var(--ink);
+  border-color: var(--accent-dim);
 }
 
 .about-close:focus-visible {
@@ -272,49 +301,85 @@ body.modal-open {
   outline-offset: 2px;
 }
 
+/* = Track Record's .version-badge, verbatim. */
 .about-meta {
-  display: flex;
-  align-items: center;
-  gap: .6rem;
-  margin-top: 1.1rem;
-  padding-bottom: 1.1rem;
-  border-bottom: 1px solid var(--line-soft);
-  font-size: .85rem;
+  display: inline-flex;
+  align-items: stretch;
+  gap: 16px;
+  font-weight: 700;
+  color: var(--accent2);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 10px 16px;
+  margin-bottom: 16px;
 }
 
-.about-meta-label { color: var(--ink-faint); }
-.about-meta-value { color: var(--ink); font-weight: 600; }
+/* = Track Record's .version-item: label stacked over value. */
+.about-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 74px;
+}
 
-.about-body { margin-top: 1.1rem; }
-
-.about-section + .about-section { margin-top: 1.15rem; }
-
-.about-label {
-  margin-bottom: .45rem;
-  font-size: .66rem;
-  font-weight: 600;
-  letter-spacing: .13em;
+.about-meta-item span {
+  color: var(--ink-dim);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  line-height: 1;
   text-transform: uppercase;
-  color: var(--ink-faint);
+}
+
+.about-meta-item strong {
+  color: var(--accent2);
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  line-height: 1.1;
+}
+
+/* Sections are divided by a rule, as in the app, rather than spaced apart. */
+.about-section {
+  padding: 13px 0;
+  border-top: 1px solid var(--line-soft);
+}
+
+.about-section:first-child {
+  padding-top: 3px;
+  border-top: 0;
+}
+
+/* = Track Record's .about-section-label, including its accent2 colour. */
+.about-label {
+  margin-bottom: 6px;
+  color: var(--accent2);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
 }
 
 .about-body p {
-  margin: 0;
-  font-size: .88rem;
-  line-height: 1.65;
+  margin: 0 0 .625rem;
+  /* Type from the kit's .about-text p. */
+  font-size: .78125rem;
+  font-weight: 500;
+  line-height: 1.7;
   color: var(--ink-dim);
 }
 
 /* Underlined, not just coloured: a link inside a paragraph that differs only
-   by hue fails WCAG 1.4.1. Weight carries the hover state instead. */
+   by hue fails WCAG 1.4.1. Accent2 and the 2px offset match the kit. */
 .about-body a {
-  color: var(--accent);
+  color: var(--accent2);
+  font-weight: 600;
   text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: .16em;
+  text-underline-offset: 2px;
 }
 
-.about-body a:hover { text-decoration-thickness: 2px; }
+.about-body a:hover { color: var(--accent); }
 .about-body a:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
@@ -354,9 +419,12 @@ body.modal-open {
   width: 8.5rem;
   height: 8.5rem;
   padding: .9rem;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 14px;
+  /* Tile surface from the kit's .card: faux-glass fill, glass edge, and the
+     inset highlight. Square geometry is ours; the material is shared. */
+  background: var(--faux-glass-card-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  box-shadow: var(--glass-highlight);
   color: inherit;
   text-decoration: none;
   transition: border-color .15s ease, background .15s ease, transform .15s ease;

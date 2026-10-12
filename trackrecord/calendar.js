@@ -369,7 +369,7 @@ function calTraineeListsHtml(activeTrainee) {
     <div class="cal-trainee-row">
       ${iconHtml(d.name, 28)}
       <span class="cal-trainee-row-name">${escapeHtml(d.name)}</span>
-      <button class="btn small" data-addswitch="${escapeAttr(d.name)}" aria-label="Add ${escapeAttr(d.name)} to my list">+ Add to my list</button>
+      <button class="btn small" data-addswitch="${escapeAttr(d.name)}" aria-label="Add to my list: ${escapeAttr(d.name)}">+ Add to my list</button>
     </div>`).join("") + (otherRows.length > TRAINEE_CAP ? `<div class="cal-trainee-empty">Showing ${TRAINEE_CAP} of ${otherRows.length} — keep typing to narrow.</div>` : "") || `<div class="cal-trainee-empty">No matches.</div>`;
 
   return `
