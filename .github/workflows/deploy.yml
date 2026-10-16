@@ -160,6 +160,18 @@ jobs:
           "$TERSER" trackrecord/kao-banner.js -c passes=3 -m -o deploy/trackrecord/kao-banner.js
           node --check deploy/trackrecord/kao-banner.js
 
+          # ---- Checklist ----
+          # Borrows favicon from the parent (../favicon.svg). No data/, no icons/.
+          mkdir -p deploy/checklist
+          cp checklist/index.html deploy/checklist/
+          "$CSSO" checklist/style.css -o deploy/checklist/style.css
+          for f in main core shell; do
+            "$TERSER" "checklist/$f.js" --module -c passes=3,toplevel -m toplevel -o "deploy/checklist/$f.js"
+          done
+          for f in main core shell; do
+            node --input-type=module --check < "deploy/checklist/$f.js"
+          done
+
           [ -f CNAME ] && cp CNAME deploy/ || true
 
       - name: Cache-bust asset URLs
@@ -181,12 +193,16 @@ jobs:
           # Track Record preview: same as the app but reaching up with ../
           sed -i "s#src=\"main.js\"#src=\"main.js?v=${TAG}\"#; s#href=\"style.css\"#href=\"style.css?v=${TAG}\"#; s#href=\"../favicon.svg\"#href=\"../favicon.svg?v=${TAG}\"#; s#src=\"../kao-banner.js?id=#src=\"../kao-banner.js?v=${TAG}\&id=#" deploy/trackrecord/preview/index.html
 
+          # Checklist: same layout as preview but without kao-banner
+          sed -i "s#src=\"main.js\"#src=\"main.js?v=${TAG}\"#; s#href=\"style.css\"#href=\"style.css?v=${TAG}\"#; s#href=\"../favicon.svg\"#href=\"../favicon.svg?v=${TAG}\"#" deploy/checklist/index.html
+
           # Assert every page actually got stamped - a silent no-op here is
           # exactly how users end up pinned to a stale bundle.
-          grep -H 'style\.css?v='       deploy/index.html deploy/trackrecord/index.html deploy/trackrecord/preview/index.html
-          grep -H 'main\.js?v='         deploy/trackrecord/index.html deploy/trackrecord/preview/index.html
+          grep -H 'style\.css?v='       deploy/index.html deploy/trackrecord/index.html deploy/trackrecord/preview/index.html deploy/checklist/index.html
+          grep -H 'main\.js?v='         deploy/trackrecord/index.html deploy/trackrecord/preview/index.html deploy/checklist/index.html
           grep -H 'kao-banner\.js?v='   deploy/trackrecord/index.html deploy/trackrecord/preview/index.html
           grep -H 'hub\.js?v='          deploy/index.html
+          grep -H 'favicon\.svg?v='     deploy/checklist/index.html
 
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
