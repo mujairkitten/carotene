@@ -527,7 +527,7 @@ export function iconHtml(name, size) {
   const initial = escapeHtml((name.trim()[0] || '?').toUpperCase());
   // Custom names have no icon file — render the fallback directly, no 404.
   const img = KNOWN_ICON_SLUGS.has(slug)
-    ? `<img src="../icons/${slug}.png" alt="" loading="lazy" decoding="async">`
+    ? `<img src="../icons/${slug}.webp" alt="" loading="lazy" decoding="async">`
     : '';
   return `<div class="trainee-icon" aria-hidden="true" style="--icon-size:${px}px">
   ${img}

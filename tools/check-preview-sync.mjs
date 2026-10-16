@@ -37,14 +37,15 @@ function normalize(text, isPreview) {
       .replaceAll('../kao-banner.js', 'kao-banner.js')
       .replaceAll('../data/', './data/')
       .replaceAll('../icons/', './icons/')
-      .replaceAll('href="../../"', 'href="../"');
+      .replaceAll('href="../../"', 'href="../"')
+      .replaceAll('href="../../checklist/"', 'href="../checklist/"');
   }
-  // Build tag: console.info('build v5.0.2'); vs console.info('[preview] build v5.1-beta1.7');
+  // Build tag: console.info('build v5.0.2'); vs console.info('[preview] build v5.0.4');
   out = out.replace(
     /console\.info\('.*?build .*?'\);/g,
     "console.info('BUILD_TAG');"
   );
-  // Version badge: <strong>v5.0.2</strong> vs <strong>v5.1-beta1.7</strong>.
+  // Version badge: <strong>v5.0.2</strong> vs <strong>v5.0.4</strong>.
   out = out.replace(
     /<div class="version-item"><span>Version<\/span><strong>.*?<\/strong><\/div>/g,
     '<div class="version-item"><span>Version</span><strong>VERSION</strong></div>'

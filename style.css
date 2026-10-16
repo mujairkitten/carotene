@@ -1,17 +1,3 @@
-/* ------------------------------------------------------------------
- * Carotene landing page
- *
- * A single continuous row of square tool tiles on one full-bleed rail,
- * with the wordmark set below it like a signature.
- *
- * The palette, the type (Quicksand), the cleat background texture and the
- * theming machinery (body.light / body.dirt, same tokens and values) are
- * lifted from Track Record's style.css so the two read as one family. The
- * About overlay is a JS-driven modal like Track Record's: focus-trapped,
- * Escape-dismissible, inert background. hub.js owns the theme switches
- * and the modal; without it the page still renders, but About won't open.
- * ------------------------------------------------------------------ */
-
 :root {
   color-scheme: dark light;
 
@@ -32,9 +18,6 @@
   --carrot: #e8873a;
   --carrot-leaf: #22b573;
 
-  /* Glass surfaces, verbatim from the shared kit (the sample page and Track
-     Record). The hub had no glass before, so these are new here; the About
-     popup now uses them the same way .modal-box does. */
   --glass-bg: rgba(23, 26, 34, .72);
   --glass-bg-soft: rgba(23, 26, 34, .65);
   --glass-border: rgba(255, 255, 255, .09);
@@ -43,8 +26,6 @@
   --faux-glass-card-bg: rgba(23, 26, 34, .86);
 }
 
-/* Light theme: same tokens as Track Record's body.light. Applied by hub.js,
-   which defaults to the system preference when nothing is stored. */
 body.light {
   --bg: #f3f4f9;
   --bg-alt: #ffffff;
@@ -63,7 +44,6 @@ body.light {
   --carrot: #c2651c;
   --carrot-leaf: #187a4d;
 
-  /* Light glass reads as solid panels rather than translucency. */
   --glass-bg: var(--bg-alt);
   --glass-bg-soft: var(--panel);
   --glass-border: var(--line);
@@ -72,7 +52,6 @@ body.light {
   --faux-glass-card-bg: var(--panel);
 }
 
-/* Dirt theme: same tokens as Track Record's body.dirt. */
 body.dirt {
   --accent: #e0a640;
   --accent-dim: #b9822e;
@@ -103,8 +82,8 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Track Record's cleat texture, same pattern geometry as the app. */
 .bg-pattern {
+  display: none;
   position: fixed;
   inset: 0;
   width: 100vw;
@@ -113,8 +92,39 @@ body {
   pointer-events: none;
 }
 
-/* Three bands: the rail takes every pixel it can, so the tools sit at
-   optical centre and the wordmark falls to the foot. */
+.cf {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  z-index: -1;
+  pointer-events: none;
+  contain: layout paint;
+}
+
+.cl {
+  position: absolute;
+  left: var(--x0);
+  top: var(--y0);
+  translate: -50% -50%;
+  animation:
+    cl-x var(--d) linear var(--dl) infinite,
+    cl-y var(--d) var(--ease) var(--dl) infinite,
+    cl-o var(--d) linear var(--dl) infinite;
+}
+
+.cl svg {
+  display: block;
+  opacity: var(--o);
+  animation: cl-spin 18s linear var(--rd) infinite;
+}
+
+body.light .cl svg { opacity: calc(var(--o) * 1.6); }
+
+@keyframes cl-x { from { left: var(--x0); } to { left: var(--x1); } }
+@keyframes cl-y { from { top: var(--y0); } to { top: var(--y1); } }
+@keyframes cl-o { 0% { opacity: 0; } 8% { opacity: 1; } 92% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes cl-spin { from { rotate: 0deg; } to { rotate: 360deg; } }
+
 .shell {
   position: relative;
   min-height: 100vh;
@@ -123,99 +133,310 @@ body {
   flex-direction: column;
 }
 
-/* ---------- the continuous row ---------- */
-
 .rail {
   flex: 1 1 auto;
   display: flex;
   align-items: center;
-  position: relative;
-  border-bottom: 1px solid var(--line);
+  justify-content: center;
+  padding: 3rem 0;
 }
 
-/* ---- About / version, pinned to the rail's baseline, right-aligned ---- */
-.rail-meta {
-  position: absolute;
-  right: 1.5rem;
-  bottom: .9rem;
+.row {
+  list-style: none;
   margin: 0;
+  padding: 0 1.5rem;
+  width: 100%;
+  max-width: 62rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1.25rem;
+}
+
+.row-item {
+  width: min(100%, 18.75rem);
+}
+
+.tool {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  background: var(--faux-glass-card-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  box-shadow: var(--glass-highlight);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+}
+
+a.tool:hover,
+a.tool:focus-visible {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: var(--glass-highlight), 0 0 24px rgba(0, 0, 0, .35);
+}
+
+body.light a.tool:hover,
+body.light a.tool:focus-visible {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .12);
+}
+
+a.tool:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.tool-head {
   display: flex;
   align-items: center;
-  gap: .6rem;
-  font-size: .78rem;
-  line-height: 1;
+  gap: .875rem;
+}
+
+.tool-mark {
+  flex: 0 0 auto;
+  width: 3rem;
+  height: 3rem;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  background: rgba(34, 181, 115, .08);
+  border: 1px solid rgba(34, 181, 115, .38);
+}
+
+.tool-mark-amber {
+  color: #e8873a;
+  background: rgba(232, 135, 58, .08);
+  border-color: rgba(232, 135, 58, .38);
+}
+
+body.light .tool-mark-amber { color: #c2651c; }
+
+.tool-mark svg { width: 1.875rem; height: 1.875rem; display: block; }
+
+.tm-check { stroke: #12141a; }
+body.light .tm-check { stroke: #fff; }
+
+.tool-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 1.1875rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.tool-go {
+  flex: 0 0 auto;
+  width: 1.25rem;
+  height: 1.25rem;
   color: var(--ink-faint);
+  transition: color .15s ease, transform .15s ease;
+}
+
+a.tool:hover .tool-go,
+a.tool:focus-visible .tool-go {
+  color: var(--accent);
+  transform: translateX(2px);
+}
+
+.tool-more {
+  display: block;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height .25s ease, opacity .2s ease, margin-top .25s ease;
+}
+
+.tool-more p {
+  margin: 0;
+  font-size: .875rem;
+  font-weight: 500;
+  line-height: 1.65;
+  color: var(--ink-dim);
+}
+
+a.tool:hover .tool-more,
+a.tool:focus-visible .tool-more {
+  max-height: 9rem;
+  opacity: 1;
+  margin-top: .75rem;
+}
+
+@media (hover: none) {
+  .tool-more {
+    max-height: none;
+    opacity: 1;
+    margin-top: .75rem;
+  }
+}
+
+.tool-soon {
+  display: flex;
+  align-items: center;
+  gap: .875rem;
+  border: 1.5px dashed var(--line);
+  background: transparent;
+  box-shadow: none;
+}
+
+.tool-soon .tool-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink-faint);
+}
+
+.tool-mark-soon {
+  background: none;
+  border: 1.5px dashed var(--line);
+}
+
+.brand {
+  flex: 0 0 auto;
+  margin: 0 auto;
+  padding: clamp(.9rem, 2.2vw, 1.25rem) 1.5rem 1.6rem;
+  max-width: 62rem;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: .25rem clamp(.35rem, 1vw, .6rem);
+}
+
+.brand-mark {
+  flex: 0 0 auto;
+  width: clamp(2rem, 5.5vw, 2.75rem);
+  height: clamp(2rem, 5.5vw, 2.75rem);
+}
+
+.brand-mark .carrot-body { stroke: var(--carrot); }
+.brand-mark .carrot-leaf { stroke: var(--carrot-leaf); }
+
+.brand-name {
+  margin: 0;
+  font-size: clamp(1.25rem, 3.6vw, 1.7rem);
+  font-weight: 700;
+  letter-spacing: .01em;
+}
+
+.brand-beta {
+  display: inline-block;
+  position: relative;
+  top: -1.05em;
+  margin-left: .45em;
+  padding: .1em .45em;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--panel);
+  color: var(--ink-dim);
+  font-size: .42em;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: .04em;
+  vertical-align: super;
   white-space: nowrap;
 }
 
-.rail-about {
+.brand-slogan {
+  margin: 0;
+  font-size: clamp(.82rem, 2vw, .95rem);
+  font-weight: 400;
+  color: var(--ink-dim);
+}
+
+.dock {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .75rem 2rem calc(.75rem + env(safe-area-inset-bottom));
+  background: var(--faux-glass-card-bg);
+  border-top: 2px solid var(--accent);
+}
+
+body.dirt .dock { border-top-color: #6b4423; }
+
+.dock-edge {
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  width: 100%;
+  height: 22px;
+  pointer-events: none;
+}
+
+.dock-edge-dirt { display: none; }
+body.dirt .dock-edge-turf { display: none; }
+body.dirt .dock-edge-dirt { display: block; }
+
+.dock-version {
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--ink-faint);
+}
+
+.dock-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--panel-2) 80%, transparent);
+  border: 1px solid var(--glass-border);
+}
+
+.dock-about {
+  padding: .5rem .875rem;
+  border-radius: 12px;
+  font-size: .8125rem;
+  font-weight: 600;
   color: var(--ink-dim);
   text-decoration: none;
   transition: color .15s ease;
 }
 
-.rail-about:hover { color: var(--accent); }
+.dock-about:hover { color: var(--accent); }
 
-.rail-about:focus-visible {
+.dock-about:focus-visible,
+.dock-btn:focus-visible {
   outline: 2px solid var(--accent);
-  outline-offset: 3px;
-  border-radius: 4px;
+  outline-offset: 2px;
 }
 
-/* A drawn dot rather than the "·" character, so it can be sized and centred
-   independently of the font's own middot metrics. */
-.rail-dot {
-  flex: 0 0 auto;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: currentColor;
-}
-
-.rail-version { color: var(--ink-faint); }
-
-/* ---- Theme toggles, pinned with the About link ---- */
-.rail-toggle {
+.dock-btn {
   flex: 0 0 auto;
   display: grid;
   place-items: center;
-  width: 1.9rem;
-  height: 1.9rem;
+  width: 2.5rem;
+  height: 2.5rem;
   padding: 0;
-  /* Button surface from the kit's .icon-pill-btn, squared off to sit inline
-     with the About link. */
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 12px;
   background: var(--panel-2);
   color: var(--ink-dim);
   cursor: pointer;
   transition: background .15s ease, color .15s ease, border-color .15s ease;
 }
 
-.rail-toggle svg {
-  width: 1.05rem;
-  height: 1.05rem;
+.dock-btn svg {
+  width: 1.125rem;
+  height: 1.125rem;
   display: block;
 }
 
-.rail-toggle:hover {
+.dock-btn:hover {
   background: var(--panel);
   color: var(--ink);
   border-color: var(--accent-dim);
 }
 
-.rail-toggle:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
+.dock-btn[aria-pressed="true"] { color: var(--accent); }
 
-.rail-toggle[aria-pressed="true"] { color: var(--accent); }
-
-/* ---- About ----------------------------------------------------------
-   A popup, not a panel that pushes the page. Driven by hub.js like Track
-   Record's own About modal: .show reveals it, the background is inert,
-   focus is trapped inside, Escape and click-outside dismiss it, and focus
-   returns to the About link on close. */
 .about {
   display: none;
 }
@@ -225,30 +446,24 @@ body {
   position: fixed;
   inset: 0;
   z-index: 100;
-  /* auto margins on the card centre it without clipping it when the card is
-     taller than the viewport - align-items: center would cut off the top. */
   overflow-y: auto;
   padding: clamp(1rem, 4vw, 2.5rem);
-  /* Scrim from the kit's .modal-overlay, so the popup dims identically. */
   background: rgba(5, 6, 9, .6);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
 }
 
-/* Stop the page behind scrolling under the overlay. */
 body.modal-open {
   overflow: hidden;
 }
 
 .about-card {
   flex: 0 0 auto;
-  margin: auto;                       /* centres on both axes */
+  margin: auto;
   width: min(100%, 35rem);
   max-height: 80vh;
   overflow-y: auto;
   padding: 1.5rem;
-  /* Surfaces copied from the kit's .about-modal: glass fill, accent-tinted
-     edge, and the same two-layer shadow. */
   background: var(--glass-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -279,7 +494,6 @@ body.modal-open {
   width: 1.75rem;
   height: 1.75rem;
   padding: 0;
-  /* Pill surface from the kit's .modal-close. */
   border: 1px solid var(--line);
   border-radius: 999px;
   background: var(--panel-2);
@@ -301,7 +515,6 @@ body.modal-open {
   outline-offset: 2px;
 }
 
-/* = Track Record's .version-badge, verbatim. */
 .about-meta {
   display: inline-flex;
   align-items: stretch;
@@ -315,7 +528,6 @@ body.modal-open {
   margin-bottom: 16px;
 }
 
-/* = Track Record's .version-item: label stacked over value. */
 .about-meta-item {
   display: flex;
   flex-direction: column;
@@ -340,7 +552,6 @@ body.modal-open {
   line-height: 1.1;
 }
 
-/* Sections are divided by a rule, as in the app, rather than spaced apart. */
 .about-section {
   padding: 13px 0;
   border-top: 1px solid var(--line-soft);
@@ -351,7 +562,6 @@ body.modal-open {
   border-top: 0;
 }
 
-/* = Track Record's .about-section-label, including its accent2 colour. */
 .about-label {
   margin-bottom: 6px;
   color: var(--accent2);
@@ -363,15 +573,12 @@ body.modal-open {
 
 .about-body p {
   margin: 0 0 .625rem;
-  /* Type from the kit's .about-text p. */
   font-size: .78125rem;
   font-weight: 500;
   line-height: 1.7;
   color: var(--ink-dim);
 }
 
-/* Underlined, not just coloured: a link inside a paragraph that differs only
-   by hue fails WCAG 1.4.1. Accent2 and the 2px offset match the kit. */
 .about-body a {
   color: var(--accent2);
   font-weight: 600;
@@ -385,173 +592,6 @@ body.modal-open {
   outline-offset: 2px;
   border-radius: 3px;
 }
-
-/* One line, never wrapped. overflow-x is a safety valve for when the
-   collection outgrows the viewport - not a carousel, so no arrows and
-   no scroll-snap to promise entries that are not there. */
-.row {
-  list-style: none;
-  margin: 0 auto;
-  padding: 0 1.5rem;
-  max-width: 62rem;
-  width: 100%;
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  justify-content: center;
-  gap: 1.25rem;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.row::-webkit-scrollbar { display: none; }
-
-.row-item { flex: 0 0 auto; }
-
-/* Square tile: width and height locked to the same value, so the row
-   keeps a strict rhythm as tools are added. */
-.tool {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: .6rem;
-  width: 8.5rem;
-  height: 8.5rem;
-  padding: .9rem;
-  /* Tile surface from the kit's .card: faux-glass fill, glass edge, and the
-     inset highlight. Square geometry is ours; the material is shared. */
-  background: var(--faux-glass-card-bg);
-  border: 1px solid var(--glass-border);
-  border-radius: 24px;
-  box-shadow: var(--glass-highlight);
-  color: inherit;
-  text-decoration: none;
-  transition: border-color .15s ease, background .15s ease, transform .15s ease;
-}
-
-.tool:hover {
-  background: var(--panel-2);
-  border-color: var(--accent);
-  transform: translateY(-2px);
-}
-
-.tool:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-}
-
-/* Each tool carries its own colour. The shell stays neutral, so a new
-   tool only has to bring its mark to look deliberate. */
-.tool-mark {
-  width: 2.75rem;
-  height: 2.75rem;
-  display: grid;
-  place-items: center;
-}
-
-.tool-mark svg { width: 100%; height: 100%; display: block; }
-
-.tool-name {
-  font-size: .8rem;
-  font-weight: 500;
-  color: var(--ink-dim);
-  text-align: center;
-  line-height: 1.3;
-}
-
-.tool:hover .tool-name { color: var(--ink); }
-
-/* ---- placeholder for an unbuilt tool ----
-   Reads as absent on purpose: dashed edge, no fill, no hover, not focusable. */
-.tool-soon {
-  border-style: dashed;
-  border-color: var(--line-soft);
-  background: transparent;
-  cursor: default;
-}
-
-.tool-soon:hover {
-  background: transparent;
-  border-color: var(--line-soft);
-  transform: none;
-}
-
-.tool-soon .tool-name { color: var(--ink-faint); }
-
-.tool-mark-soon {
-  border: 1.5px dashed var(--line);
-  border-radius: 10px;
-}
-
-/* ---------- wordmark ---------- */
-
-/* One horizontal lockup: carrot, name, slogan. Wraps to two lines only
-   when the viewport is too narrow to hold it, which on a phone it is. */
-.brand {
-  flex: 0 0 auto;
-  margin: 0 auto;
-  padding: clamp(.9rem, 2.2vw, 1.25rem) 1.5rem clamp(1.1rem, 2.6vw, 1.5rem);
-  max-width: 62rem;
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: .25rem clamp(.35rem, 1vw, .6rem);
-}
-
-.brand-mark {
-  flex: 0 0 auto;
-  width: clamp(2rem, 5.5vw, 2.75rem);
-  height: clamp(2rem, 5.5vw, 2.75rem);
-}
-
-/* An edible carrot: orange root, green tops. --carrot-leaf tracks --accent
-   in every theme, same as Track Record. */
-.brand-mark .carrot-body { stroke: var(--carrot); }
-.brand-mark .carrot-leaf { stroke: var(--carrot-leaf); }
-
-/* The wordmark carries the only 700 on the page; tiles stay lighter so
-   the eye still lands here last, which is the point. */
-.brand-name {
-  margin: 0;
-  font-size: clamp(1.25rem, 3.6vw, 1.7rem);
-  font-weight: 700;
-  letter-spacing: .01em;
-}
-
-/* Status badge, raised off the title's baseline. Sized in em so it tracks
-   the clamp()ed title instead of drifting at narrow widths. The explicit
-   `top` is what actually sells the superscript: vertical-align: super
-   alone leaves the padded box straddling the cap line, so it reads as
-   merely centred rather than raised. */
-.brand-beta {
-  display: inline-block;
-  position: relative;
-  top: -1.05em;
-  margin-left: .45em;
-  padding: .1em .45em;
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  background: var(--panel);
-  color: var(--ink-dim);
-  font-size: .42em;
-  font-weight: 600;
-  line-height: 1.5;
-  letter-spacing: .04em;
-  vertical-align: super;
-  white-space: nowrap;
-}
-
-.brand-slogan {
-  margin: 0;
-  font-size: clamp(.82rem, 2vw, .95rem);
-  font-weight: 400;
-  color: var(--ink-dim);
-}
-
-/* ---------- a11y ---------- */
 
 .skip-link {
   position: absolute;
@@ -567,6 +607,9 @@ body.modal-open {
 .skip-link:focus { left: 0; }
 
 @media (prefers-reduced-motion: reduce) {
-  .tool { transition: none; }
-  .tool:hover { transform: none; }
+  .cf { display: none; }
+  .bg-pattern { display: block; }
+  .tool, .tool-go, .tool-more { transition: none; }
+  a.tool:hover, a.tool:focus-visible { transform: none; }
+  a.tool:hover .tool-go, a.tool:focus-visible .tool-go { transform: none; }
 }

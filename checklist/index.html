@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="'Checklist' - daily and content to-do lists for UM:PD that reset on game time.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; worker-src 'none'">
+  <title>'Checklist' - Carotene</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip-link" href="#sections">Skip to content</a>
+
+<svg class="bg-pattern" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <g id="cleat-shape">
+      <path d="M-13,14 L-11,-3 A11,11 0 0 1 11,-3 L13,14" fill="none" stroke="var(--accent)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <pattern id="cleat-pattern" width="460" height="460" patternUnits="userSpaceOnUse">
+      <use href="#cleat-shape" opacity="0.13" transform="translate(90,100) scale(1.3) rotate(15)"/>
+      <use href="#cleat-shape" opacity="0.10" transform="translate(370,130) scale(1.1) rotate(-20)"/>
+      <use href="#cleat-shape" opacity="0.11" transform="translate(140,350) scale(1.1) rotate(-12)"/>
+      <use href="#cleat-shape" opacity="0.14" transform="translate(390,380) scale(1.3) rotate(22)"/>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#cleat-pattern)"/>
+</svg>
+
+<div class="topbar">
+  <div class="wrap topbar-inner">
+    <div class="brand">
+      <h1>
+        <svg class="brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 6.5l1.6 1.6L8.5 5M4 12.5l1.6 1.6L8.5 11M4 18.5l1.6 1.6L8.5 17"/>
+          <path d="M12 7h8M12 13h8M12 19h8"/>
+        </svg>
+        <span class="sr-only">'Checklist'</span>
+      </h1>
+    </div>
+    <div class="topbar-actions">
+      <nav class="rail-nav" aria-label="Main navigation">
+        <button class="btn rail-action" id="jump-top-btn" type="button" aria-label="Jump to top" data-tooltip="Jump to top">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 15l6-6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="btn rail-action" id="untick-btn" type="button" aria-label="Untick everything" data-tooltip="Untick everything">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 14L4 9L9 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 9H14C17.3137 9 20 11.6863 20 15C20 18.3137 17.3137 21 14 21H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </nav>
+      <div class="settings-wrap">
+        <button class="btn icon-btn" id="settings-btn" aria-label="Settings" aria-haspopup="dialog" aria-expanded="false" aria-controls="settings-panel">
+          <svg viewBox="0 0 24 24" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.03 7.03 0 0 0-1.6-.94l-.36-2.54a.5.5 0 0 0-.5-.43h-3.84a.5.5 0 0 0-.5.43l-.36 2.54a7.03 7.03 0 0 0-1.6.94l-2.39-.96a.5.5 0 0 0-.6.22l-1.92 3.32a.5.5 0 0 0 .12.64l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.14.24.42.34.66.25l2.39-.96c.5.33 1.04.61 1.6.94l.36 2.54c.05.22.25.38.5.38h3.84c.25 0 .45-.16.5-.38l.36-2.54c.56-.33 1.1-.61 1.6-.94l2.39.96c.24.09.52-.01.66-.25l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58z" stroke-width="1.5"/>
+            <circle cx="12" cy="12" r="3.5" stroke-width="1.8" fill="none"/>
+          </svg>
+        </button>
+        <div class="settings-panel" id="settings-panel" role="dialog" aria-label="Settings">
+          <div class="settings-group-label">Appearance</div>
+          <div class="settings-row settings-row-icons">
+            <button class="icon-pill-btn" id="mode-toggle-btn" aria-label="Toggle light/dark mode" aria-pressed="false" data-tooltip="Toggle mode">
+              <svg class="icon-toggle-sun" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path d="M12 2.5V5M12 19V21.5M4.2 4.2L6 6M18 18L19.8 19.8M2.5 12H5M19 12H21.5M4.2 19.8L6 18M18 6L19.8 4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <svg class="icon-toggle-moon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <button class="icon-pill-btn" id="theme-toggle-btn" aria-label="Toggle Turf/Dirt color theme" aria-pressed="false" data-tooltip="Toggle color theme">
+              <svg class="icon-toggle-turf" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 20V13C6 10 8 8 8 8C8 8 6 10 6 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 20V10C12 7 14 5 14 5C14 5 12 7 12 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M18 20V13C18 10 20 8 20 8C20 8 18 10 18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <svg class="icon-toggle-dirt" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 18L8 9L12 15L15 10L21 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M3 20H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+          <div class="settings-group-label" style="margin-top:6px;">Navbar position</div>
+          <div class="nav-position-group" role="group" aria-label="Navbar position">
+            <button class="nav-pos-btn" type="button" data-pos="left" aria-label="Place navbar on the left" aria-pressed="false" data-tooltip="Left">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="4" width="18" height="16" rx="2.5" stroke="currentColor" stroke-width="2"/>
+                <rect x="4.5" y="5.5" width="4" height="13" rx="1.5" fill="currentColor"/>
+              </svg>
+            </button>
+            <button class="nav-pos-btn" type="button" data-pos="top" aria-label="Place navbar at the top" aria-pressed="false" data-tooltip="Top">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="4" width="18" height="16" rx="2.5" stroke="currentColor" stroke-width="2"/>
+                <rect x="4.5" y="5.5" width="15" height="4" rx="1.5" fill="currentColor"/>
+              </svg>
+            </button>
+            <button class="nav-pos-btn" type="button" data-pos="right" aria-label="Place navbar on the right" aria-pressed="false" data-tooltip="Right">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="4" width="18" height="16" rx="2.5" stroke="currentColor" stroke-width="2"/>
+                <rect x="15.5" y="5.5" width="4" height="13" rx="1.5" fill="currentColor"/>
+              </svg>
+            </button>
+            <button class="nav-pos-btn" type="button" data-pos="bottom" aria-label="Place navbar at the bottom" aria-pressed="false" data-tooltip="Bottom">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="4" width="18" height="16" rx="2.5" stroke="currentColor" stroke-width="2"/>
+                <rect x="4.5" y="14.5" width="15" height="4" rx="1.5" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+          <div class="settings-divider"></div>
+          <button class="btn small settings-about-btn" id="about-btn">About 'Checklist'</button>
+        </div>
+      </div>
+      <button class="btn rail-action" id="jump-bottom-btn" type="button" aria-label="Jump to bottom" data-tooltip="Jump to bottom">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="rail-item-wrap carotene-wrap">
+      <button class="btn rail-action" id="carotene-btn" type="button" aria-label="Carotene" data-tooltip="Carotene" aria-expanded="false" aria-controls="carotene-panel">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <g transform="rotate(45 12 12)">
+            <path class="carrot-body" d="M12 21C10.5 17 9 13.4 9 10.3C9 7.7 10.3 6.1 12 6.1C13.7 6.1 15 7.7 15 10.3C15 13.4 13.5 17 12 21Z" stroke-width="1.8"/>
+            <path class="carrot-leaf" d="M12 6.3C11 4.9 10 4.3 8.6 3.9" stroke-width="1.5"/>
+            <path class="carrot-leaf" d="M12 6.1C12 4.7 12 3.7 12 2.9" stroke-width="1.5"/>
+            <path class="carrot-leaf" d="M12 6.3C13 4.9 14 4.3 15.4 3.9" stroke-width="1.5"/>
+          </g>
+        </svg>
+      </button>
+      <div class="carotene-panel" id="carotene-panel" role="region" aria-label="Carotene" aria-hidden="true">
+        <a class="carotene-panel-brand" href="../">
+          <svg class="carotene-panel-mark" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
+            <g transform="rotate(45 12 12)">
+              <path class="carrot-body" d="M12 21C10.5 17 9 13.4 9 10.3C9 7.7 10.3 6.1 12 6.1C13.7 6.1 15 7.7 15 10.3C15 13.4 13.5 17 12 21Z" stroke-width="1.8"/>
+              <path class="carrot-leaf" d="M12 6.3C11 4.9 10 4.3 8.6 3.9" stroke-width="1.5"/>
+              <path class="carrot-leaf" d="M12 6.1C12 4.7 12 3.7 12 2.9" stroke-width="1.5"/>
+              <path class="carrot-leaf" d="M12 6.3C13 4.9 14 4.3 15.4 3.9" stroke-width="1.5"/>
+            </g>
+          </svg>
+          <span class="carotene-panel-name">Carotene<sup class="carotene-panel-beta">Beta</sup></span>
+        </a>
+        <ul class="carotene-panel-list">
+          <li>
+            <a class="carotene-panel-item" href="../trackrecord/">
+              <span class="carotene-panel-item-mark" aria-hidden="true">
+                <svg viewBox="0 0 120 120" focusable="false" xmlns="http://www.w3.org/2000/svg">
+                  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="17" y="17" width="40" height="40" rx="9" fill="#22b573" stroke="#22b573" stroke-width="2"/>
+                    <path d="M26.5 37l8 8 13-16" stroke="#ffffff" stroke-width="5"/>
+                    <rect x="63" y="17" width="40" height="40" rx="9" fill="#22b573" stroke="#22b573" stroke-width="2"/>
+                    <path d="M72.5 37l8 8 13-16" stroke="#ffffff" stroke-width="5"/>
+                    <rect x="17" y="63" width="40" height="40" rx="9" fill="#22b573" stroke="#22b573" stroke-width="2"/>
+                    <path d="M26.5 83l8 8 13-16" stroke="#ffffff" stroke-width="5"/>
+                    <rect x="63" y="63" width="40" height="40" rx="9" fill="none" stroke="#9aa3b8" stroke-width="2"/>
+                  </g>
+                </svg>
+              </span>
+              <span class="carotene-panel-item-name">Track Record</span>
+            </a>
+          </li>
+          <li>
+            <span class="carotene-panel-item is-current" aria-current="page">
+              <span class="carotene-panel-item-mark carotene-panel-item-mark-amber" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4 6.5l1.6 1.6L8.5 5M4 12.5l1.6 1.6L8.5 11M4 18.5l1.6 1.6L8.5 17"/>
+                  <path d="M12 7h8M12 13h8M12 19h8"/>
+                </svg>
+              </span>
+              <span class="carotene-panel-item-name">'Checklist'</span>
+            </span>
+          </li>
+          <li>
+            <span class="carotene-panel-item is-soon">
+              <span class="carotene-panel-item-mark" aria-hidden="true"></span>
+              <span class="carotene-panel-item-name">Coming Soon</span>
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="wrap">
+    <div id="sections"></div>
+  </div>
+</main>
+
+<div class="modal-overlay" id="about-overlay" role="dialog" aria-modal="true" aria-labelledby="about-title">
+  <div class="modal-box about-modal" id="about-modal">
+    <div class="modal-head">
+      <h2 class="modal-title" id="about-title">About 'Checklist'</h2>
+      <button class="modal-close" id="about-close" aria-label="Close About">✕</button>
+    </div>
+    <div class="version-badge">
+      <div class="version-item"><span>Version</span><strong>Beta 1</strong></div>
+    </div>
+    <div class="about-text">
+      <div class="about-section">
+        <div class="about-section-label">How it works</div>
+        <p>Tick a task when you finish it. <strong>Daily</strong> tasks untick at 15:00 UTC and <strong>Content</strong> tasks untick at 22:00 UTC. One-time tasks stay until you untick or remove them.</p>
+        <p>The seven required daily missions can't be removed. Ticking <strong>Complete Daily Missions</strong> ticks all of them, and you can add extra or event missions under it.</p>
+        <p>Ticking <strong>Daily Race (3 times)</strong> also ticks <strong>Daily Race (once)</strong>, and ticking <strong>Request the shoes in the Club</strong> also ticks <strong>Check the Club</strong>. Unticking the first task of a pair unticks the second one too.</p>
+        <p>Each list shows a live countdown to its next reset, and that time in your own time zone.</p>
+      </div>
+      <div class="about-section">
+        <div class="about-section-label">Privacy</div>
+        <p>Your tasks stay private in this browser. Clearing your browser data will erase them.</p>
+      </div>
+      <div class="about-section about-links">
+        <p class="about-credit">2026, Mujairkitten · Made with various AI tools · Not affiliated with Cygames.<br>Source code is licensed under GPL-3.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="tooltip" role="tooltip" aria-hidden="true"></div>
+
+<div id="sr-announcer" class="sr-only" aria-live="polite"></div>
+
+<div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>

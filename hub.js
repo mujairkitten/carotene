@@ -1,25 +1,7 @@
-/* ------------------------------------------------------------------
- * Carotene hub — theme switches and the About modal.
- *
- * Classic script, no modules, no imports. Same-origin only, so it runs
- * under the hub's own script-src 'self' CSP.
- *
- * Theming mirrors Track Record exactly: body.light / body.dirt carry the
- * same tokens and values as the app's style.css. Preference order:
- *   1. the hub's own stored choice (localStorage "carotene-hub-theme"),
- *   2. Track Record's stored choice — the "mylist" snapshot it keeps in this
- *      same origin, under state.settings — when the visitor has already
- *      picked a theme there,
- *   3. the system prefers-color-scheme.
- * ------------------------------------------------------------------ */
 (function () {
   'use strict';
 
   var LS_KEY = 'carotene-hub-theme';
-  // Track Record persists its ENTIRE state as one snapshot under this key
-  // (core.js saveState -> localStorage.setItem('mylist', JSON.stringify(state))),
-  // where state is { myList, settings: { lightMode, colorTheme, ... } }. The
-  // theme is therefore two levels down, not a flat { lightMode }.
   var TR_KEY = 'mylist';
 
   function readTheme() {
@@ -29,23 +11,21 @@
         var t = JSON.parse(raw);
         return { light: !!t.light, dirt: !!t.dirt };
       }
-    } catch (e) { /* storage unavailable: fall through */ }
+    } catch (e) {}
     try {
       var snap = JSON.parse(localStorage.getItem(TR_KEY) || 'null');
       var tr = snap && snap.settings;
       if (tr && typeof tr.lightMode === 'boolean') {
         return { light: tr.lightMode, dirt: tr.colorTheme === 'dirt' };
       }
-    } catch (e2) { /* fall through */ }
+    } catch (e2) {}
     var mq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: light)') : null;
     return { light: !!(mq && mq.matches), dirt: false };
   }
 
   function saveTheme(t) {
-    try { localStorage.setItem(LS_KEY, JSON.stringify(t)); } catch (e) { /* ignore */ }
+    try { localStorage.setItem(LS_KEY, JSON.stringify(t)); } catch (e) {}
   }
-
-  /* ---- theme toggle buttons (injected into the rail meta) ---- */
 
   var SVG_SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.3M12 19.2v2.3M2.5 12h2.3M19.2 12h2.3M5 5l1.6 1.6M17.4 17.4L19 19M19 5l-1.6 1.6M6.6 17.4L5 19"/></svg>';
   var SVG_MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.2A8.2 8.2 0 0 1 9.8 4 8.2 8.2 0 1 0 20 14.2Z"/></svg>';
@@ -55,20 +35,20 @@
     var b = document.createElement('button');
     b.type = 'button';
     b.id = id;
-    b.className = 'rail-toggle';
+    b.className = 'dock-btn';
     b.setAttribute('aria-label', label);
     return b;
   }
 
   var theme = readTheme();
 
-  var meta = document.querySelector('.rail-meta');
+  var nav = document.querySelector('.dock-nav');
   var modeBtn = makeToggle('hub-mode-btn', 'Toggle light/dark mode');
   var themeBtn = makeToggle('hub-theme-btn', 'Toggle Turf/Dirt color theme');
   themeBtn.innerHTML = SVG_THEME;
-  if (meta) {
-    meta.insertBefore(themeBtn, meta.firstChild);
-    meta.insertBefore(modeBtn, meta.firstChild);
+  if (nav) {
+    nav.appendChild(modeBtn);
+    nav.appendChild(themeBtn);
   }
 
   function syncThemeButtons(t) {
@@ -96,19 +76,57 @@
 
   applyTheme(theme);
 
-  /* ---- About modal (like Track Record's own) ---- */
+  function spawnCleats() {
+    var field = document.getElementById('cleat-field');
+    if (!field) return;
+    var colors = ['#4ee38a', '#5b8cff', '#ffa552'];
+    var sizes = [16, 20, 26, 32, 40, 48, 56];
+    var count = 40;
+    var frag = document.createDocumentFragment();
+
+    function rand(a, b) { return a + Math.random() * (b - a); }
+    function pct(v) { return v.toFixed(1) + '%'; }
+
+    for (var i = 0; i < count; i++) {
+      var size = sizes[Math.floor(Math.random() * sizes.length)];
+      var x0 = rand(-12, 40), y0 = rand(65, 112);
+      var x1 = rand(60, 112), y1 = rand(-12, 35);
+      var dur = rand(40, 72);
+      var el = document.createElement('div');
+      el.className = 'cl';
+      var s = el.style;
+      s.setProperty('--x0', pct(x0));
+      s.setProperty('--y0', pct(y0));
+      s.setProperty('--x1', pct(x1));
+      s.setProperty('--y1', pct(y1));
+      s.setProperty('--xm', pct((x0 + x1) / 2 + rand(-25, 25)));
+      s.setProperty('--ym', pct((y0 + y1) / 2 + rand(-25, 25)));
+      s.setProperty('--d', dur.toFixed(1) + 's');
+      s.setProperty('--dl', (-rand(0, dur)).toFixed(1) + 's');
+      s.setProperty('--rd', (-rand(0, 18)).toFixed(1) + 's');
+      s.setProperty('--o', rand(0.16, 0.28).toFixed(2));
+      s.setProperty('--ease', 'cubic-bezier(' + rand(0.1, 0.35).toFixed(2) + ',' + rand(0.55, 0.85).toFixed(2) + ',' + rand(0.4, 0.6).toFixed(2) + ',1)');
+      el.innerHTML = '<svg viewBox="-22 -18 44 44" width="' + size + '" height="' + size + '" fill="none" aria-hidden="true" focusable="false"><path d="M-13,14 L-11,-3 A11,11 0 0 1 11,-3 L13,14" stroke="' + colors[i % 3] + '" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      frag.appendChild(el);
+    }
+    field.appendChild(frag);
+  }
+
+  spawnCleats();
 
   var about = document.getElementById('about');
   var aboutClose = document.getElementById('about-close');
-  var aboutLink = document.querySelector('.rail-about');
+  var aboutLink = document.querySelector('.dock-about');
   var opener = null;
 
   function setPageInert(on) {
     var tools = document.getElementById('tools');
     var brand = document.querySelector('.brand');
+    var dock = document.querySelector('.dock');
     var skip = document.querySelector('.skip-link');
     if (tools) tools.inert = on;
     if (brand) brand.inert = on;
+    if (dock) dock.inert = on;
     if (skip) skip.inert = on;
   }
 
@@ -133,10 +151,6 @@
     about.classList.remove('show');
     document.body.classList.remove('modal-open');
     setPageInert(false);
-    // When the modal was opened from a deep link there is no focused opener:
-    // document.activeElement is body, which is truthy and connected but
-    // cannot take focus, so the fallback has to kick in or a keyboard user is
-    // dumped at the top of the document. Same guard as settings.js closeModal.
     var target = (opener && opener !== document.body && opener.isConnected &&
       !opener.closest('[inert]')) ? opener : aboutLink;
     if (target) target.focus();
@@ -175,9 +189,8 @@
     }
   });
 
-  // Old #about links (from before the modal) still land here.
   if (window.location.hash === '#about') {
-    try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch (e) { /* ignore */ }
+    try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch (e) {}
     openAbout();
   }
 })();

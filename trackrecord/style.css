@@ -433,7 +433,7 @@ body.nav-top .cal-sidebar {
   position: absolute;
   bottom: calc(100% + 8px);
   right: 0;
-  width: 15rem;
+  width: 20rem;
   max-width: calc(100vw - 24px);
   background: var(--faux-glass-bg);
   border: 1px solid var(--glass-border);
@@ -564,6 +564,20 @@ body.nav-top .cal-sidebar {
   border-color: color-mix(in srgb, var(--accent) 55%, transparent);
   color: var(--ink);
   font-weight: 600;
+}
+a.carotene-panel-item {
+  text-decoration: none;
+}
+a.carotene-panel-item:hover,
+a.carotene-panel-item:focus-visible {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+.carotene-panel-item-mark-amber {
+  color: #e8873a;
+}
+body.light .carotene-panel-item-mark-amber {
+  color: #c2651c;
 }
 .carotene-panel-item-mark {
   width: 1.75rem;
