@@ -5,7 +5,7 @@ const POS_DESKTOP = ['left', 'bottom', 'right', 'top'];
 const POS_MOBILE = ['top', 'bottom'];
 
 const theme = { light: false, dirt: false };
-const ui = { desktop: 'right', mobile: 'bottom' };
+export const ui = { desktop: 'right', mobile: 'bottom', collapsed: [] };
 
 function readTheme() {
   try {
@@ -31,7 +31,12 @@ function readUi() {
     const raw = JSON.parse(localStorage.getItem(UI_KEY) || 'null');
     if (raw && POS_DESKTOP.includes(raw.desktop)) ui.desktop = raw.desktop;
     if (raw && POS_MOBILE.includes(raw.mobile)) ui.mobile = raw.mobile;
+    if (raw && Array.isArray(raw.collapsed)) ui.collapsed = raw.collapsed.filter(String);
   } catch (e) {}
+}
+
+export function saveUi() {
+  try { localStorage.setItem(UI_KEY, JSON.stringify(ui)); } catch (e) {}
 }
 
 function save(key, value) {
@@ -209,7 +214,7 @@ function setPanel(panel, btn, open) {
   if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
 }
 
-function closeSettings() { setPanel(byId('settings-panel'), byId('settings-btn'), false); }
+export function closeSettings() { setPanel(byId('settings-panel'), byId('settings-btn'), false); }
 
 function closeCarotene() {
   const panel = byId('carotene-panel');

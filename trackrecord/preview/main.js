@@ -49,7 +49,7 @@ function closeCarotenePanel() {
 }
 
 async function init() {
-  console.info('[preview] build v5.0.4');
+  console.info('[preview] build v5.0.5');
   setRenderHandlers({
     mainView: renderMainView,
     myList: () => { if (!state.settings.calendarViewMode) renderMyList(); },

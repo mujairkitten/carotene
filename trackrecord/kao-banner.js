@@ -22,9 +22,9 @@
  *                 Set animation=off to disable
  *
  * ---------------------------------------------------------------------------
- * TrackRecord vendor notes (2026-10-03): this copy is byte-identical to
- * https://keepandroidopen.org/banner.js as of the date above, plus the
- * following local hardening changes:
+ * TrackRecord vendor notes (2026-10-03): this copy is synchronized with
+ * https://keepandroidopen.org/banner.js (original), plus the following
+ * local hardening changes:
  *   - The 1s countdown interval only ticks while the banner is actually
  *     visible (IntersectionObserver), instead of for the page lifetime.
  *   - Post-deadline, the countdown clamps at zero instead of rendering
@@ -54,13 +54,13 @@
     id:      "Android akan menjadi platform yang terkunci.",
     it:      "Android diventer\u00E0 una piattaforma bloccata",
     ko:      "Android\uAC00 \uD3D0\uC1C4\uB41C \uD50C\uB7AB\uD3FC\uC774 \uB418\uAE30\uAE4C\uC9C0 \uB0A8\uC740 \uC2DC\uAC04:",
-    pl:      "Android stanie si\u0119 platform\u0105 zamkni\u0119t\u0105 za",
+    pl:      "Android stanie si\u0119 platform\u0105 zamkni\u0105 za",
     "pt-BR": "O Android se tornar\u00E1 uma plataforma fechada em",
-    ru:      "Android \u0441\u0442\u0430\u043D\u0435\u0442 \u0437\u0430\u043A\u0440\u044B\u0442\u043E\u0439 \u043F\u043B\u0430\u0442\u0444\u043E\u0440\u043C\u043E\u0439 \u0447\u0435\u0440\u0435\u0437",
+    ru:      "Android \u0441\u0442\u0430\u043d\u0435\u0442 \u0437\u0430\u043A\u0440\u044B\u0442\u043e\u0439 \u043f\u043b\u0430\u0442\u0444\u043e\u0440\u043c\u043e\u0439 \u0447\u0435\u0440\u0435\u0437",
     sk:      "Android sa stane uzamknutou platformou",
     th:      "Android\u0E08\u0E30\u0E40\u0E1B\u0E47\u0E19\u0E41\u0E1E\u0E25\u0E15\u0E1F\u0E2D\u0E23\u0E4C\u0E21\u0E17\u0E35\u0E48\u0E16\u0E39\u0E01\u0E25\u0E47\u0E2D\u0E01",
     tr:      "Android k\u0131s\u0131tl\u0131 bir platform haline gelecek.",
-    uk:      "Android \u0441\u0442\u0430\u043D\u0435 \u0437\u0430\u043A\u0440\u0438\u0442\u043E\u044E \u043F\u043B\u0430\u0442\u0444\u043E\u0440\u043C\u043E\u044E",
+    uk:      "Android \u0441\u0442\u0430\u043d\u0435 \u0437\u0430\u043a\u0440\u0438\u0442\u0443 \u043f\u043b\u0430\u0442\u0444\u043e\u0440\u043c\u043e\u0443",
     "zh-CN": "\u5B89\u5353\u5C06\u6210\u4E3A\u4E00\u4E2A\u5C01\u95ED\u5E73\u53F0",
     "zh-TW": "Android \u5C07\u6210\u70BA\u4E00\u500B\u5C01\u9589\u5E73\u53F0",
     ja:      "Androidは閉鎖的なプラットフォームになろうとしています",
@@ -68,7 +68,7 @@
     hu:      "Az Android egy lezárt platform lesz",
     vi:      "Android sẽ trở thành một hệ điều hành đóng",
     bg:      "Android ще стане заключена платформа след",
-    be:      "Android \u0441\u0442\u0430\u043d\u0435 \u0437\u0430\u043a\u0440\u044b\u0442\u0430\u0439 \u043f\u043b\u0430\u0444\u0442\u043e\u0440\u043c\u0430\u0439 \u0020 \u0020",
+    be:      "Android \u0441\u0442\u0430\u043d\u0435 \u0437\u0430\u043a\u0440\u044b\u0442\u0430\u0439 \u043f\u043b\u0430\u0442\u0444\u043e\u0440\u043c\u0430\u0439 \u0020 \u0020",
     hi:      "Android एक बंद इकोसिस्टम बन जाएगा"
   };
 

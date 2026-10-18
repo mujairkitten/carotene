@@ -1015,6 +1015,62 @@ body.light #tooltip { box-shadow: 0 6px 20px rgba(0,0,0,.2); }
 body.light .modal-box { box-shadow: 0 12px 40px rgba(0,0,0,.2); }
 body.light .modal-overlay { background: rgba(0,0,0,.22); }
 body.light .add-trophy input { box-shadow: inset 0 2px 4px rgba(0,0,0,.07); background: var(--bg); }
+.backup-textarea {
+  width: 100%;
+  min-height: 160px;
+  font-family: ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
+  font-size: 11.5px;
+  line-height: 1.5;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--ink);
+  resize: vertical;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+}
+.backup-textarea:focus {
+  border-color: var(--accent-dim);
+  box-shadow: 0 0 12px rgba(var(--accent-rgb), .3);
+}
+.backup-import-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.backup-error {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--f-text);
+  background: color-mix(in srgb, var(--f) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--f) 45%, transparent);
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+}
+.backup-error[hidden] { display: none; }
+.backup-export-meta {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-dim);
+  margin: 10px 0 0;
+}
+.backup-section-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent2);
+  margin: 0 0 6px;
+}
+.backup-divider {
+  border: none;
+  border-top: 1px solid var(--line-soft);
+  margin: 18px 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;

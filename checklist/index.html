@@ -48,10 +48,15 @@
             <path d="M6 15l6-6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
-        <button class="btn rail-action" id="untick-btn" type="button" aria-label="Untick everything" data-tooltip="Untick everything">
+        <button class="btn rail-action" id="untick-btn" type="button" aria-label="Reset" data-tooltip="Reset">
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
             <path d="M9 14L4 9L9 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             <path d="M4 9H14C17.3137 9 20 11.6863 20 15C20 18.3137 17.3137 21 14 21H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="btn rail-action" id="backup-btn" type="button" aria-label="Backup" data-tooltip="Backup">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3v11M8 10l4 4 4-4M5 19h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
       </nav>
@@ -201,7 +206,7 @@
       <button class="modal-close" id="about-close" aria-label="Close About">✕</button>
     </div>
     <div class="version-badge">
-      <div class="version-item"><span>Version</span><strong>Beta 1</strong></div>
+      <div class="version-item"><span>Version</span><strong>Beta 2</strong></div>
     </div>
     <div class="about-text">
       <div class="about-section">
@@ -217,6 +222,41 @@
       </div>
       <div class="about-section about-links">
         <p class="about-credit">2026, Mujairkitten · Made with various AI tools · Not affiliated with Cygames.<br>Source code is licensed under GPL-3.</p>
+      </div>
+      <div id="kao-banner"></div>
+      <script src="../kao-banner.js?id=kao-banner&amp;size=mini"></script>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="backup-overlay" role="dialog" aria-modal="true" aria-labelledby="backup-title">
+  <div class="modal-box" id="backup-modal">
+    <div class="modal-head">
+      <h2 class="modal-title" id="backup-title">Backup</h2>
+      <button class="modal-close" id="backup-close" aria-label="Close Backup">✕</button>
+    </div>
+    <div class="about-text">
+      <div class="backup-section">
+        <div class="backup-section-label">Export</div>
+        <p>Save your checklist to a file or copy it. Keep it somewhere safe — you can import it again on another device or after clearing browser data.</p>
+        <textarea class="backup-textarea" id="backup-export-text" readonly spellcheck="false" aria-label="Exported checklist JSON"></textarea>
+        <div class="backup-import-actions">
+          <button class="btn small" id="backup-copy-btn">Copy</button>
+          <button class="btn small" id="backup-export-file-btn">Export file</button>
+        </div>
+        <div class="backup-export-meta"><span id="backup-export-stamp" aria-live="polite"></span></div>
+      </div>
+      <hr class="backup-divider" aria-hidden="true">
+      <div class="backup-section">
+        <div class="backup-section-label">Import</div>
+        <p>Paste an exported checklist, or choose a file. Tasks already in your list are skipped; duplicates are not added.</p>
+        <textarea class="backup-textarea" id="backup-import-text" placeholder="Paste your exported JSON here…" spellcheck="false" aria-label="Pasted backup JSON"></textarea>
+        <div class="backup-error" id="backup-import-error" role="alert" hidden></div>
+        <div class="backup-import-actions">
+          <button class="btn small" id="backup-import-text-btn">Import pasted list</button>
+          <label class="btn small" for="backup-import-file">Import from file</label>
+          <input type="file" id="backup-import-file" class="sr-only" accept=".json">
+        </div>
       </div>
     </div>
   </div>

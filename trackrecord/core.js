@@ -232,18 +232,10 @@ let storageHealthy = true;
 export async function loadState() {
   let parsed = null;
   try {
-    if (window.storage && typeof window.storage.get === 'function') {
-      const res = await window.storage.get('mylist', false);
-      if (res && res.value) {
-        if (res.value.length > MAX_STORED_BYTES) throw new Error("stored data too large");
-        parsed = JSON.parse(res.value);
-      }
-    } else {
-      const val = localStorage.getItem('mylist');
-      if (val) {
-        if (val.length > MAX_STORED_BYTES) throw new Error("stored data too large");
-        parsed = JSON.parse(val);
-      }
+    const val = localStorage.getItem('mylist');
+    if (val) {
+      if (val.length > MAX_STORED_BYTES) throw new Error("stored data too large");
+      parsed = JSON.parse(val);
     }
   } catch (e) {
     console.error("Storage load failed", e);
@@ -273,12 +265,8 @@ export function saveState() {
         }
         saveQueue = saveQueue.catch(() => {}).then(async () => {
           try {
-            if (window.storage && typeof window.storage.set === 'function') {
-              await window.storage.set('mylist', snapshot, false);
-            } else {
-              localStorage.setItem('mylist', snapshot);
-            }
-          } catch (e) {
+          localStorage.setItem('mylist', snapshot);
+        } catch (e) {
             console.error("Storage save failed", e);
             const isQuota = e && (e.name === 'QuotaExceededError' || e.code === 22);
             const message = isQuota

@@ -6,7 +6,7 @@ const MAX_STORED = 256 * 1024;
 const DAY = 86400000;
 const SAFE_ID = /^[a-z0-9]{7}$/;
 const ID_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789';
-const LOCKED_TASKS = [
+export const LOCKED_TASKS = [
   ['dm00001', 'Win a race in Career Run'],
   ['dm00002', 'Complete a Career Run'],
   ['dm00003', 'Daily Race (once)'],
@@ -18,8 +18,15 @@ const LOCKED_TASKS = [
 
 const LINKS = {
   dm00004: 'dm00003',
-  dm00007: 'dm00006'
+  dm00007: 'dm00006',
+  dl00003: 'dm00006'
 };
+
+export const STANDALONE_REQUIRED_TASKS = [
+  ['dl00001', 'Do Daily Legend Race'],
+  ['dl00002', 'Purchase something at Daily Shop'],
+  ['dl00003', 'Donate shoes at the Club (10 times)']
+];
 
 export const TYPES = ['daily', 'content', 'once'];
 export const RESETS = {
@@ -60,12 +67,19 @@ function isPlainObject(v) {
   return v !== null && typeof v === 'object' && !Array.isArray(v);
 }
 
-function normalizeTasks(raw) {
+export function normalizeTasks(raw) {
   const list = Array.isArray(raw) ? raw : [];
   const usedIds = new Set();
   const usedNames = new Set();
   const out = [];
   for (const [id, name] of LOCKED_TASKS) {
+    const stored = list.find(item => isPlainObject(item) && item.id === id);
+    const doneAt = stored && Number.isFinite(stored.doneAt) && stored.doneAt >= 0 ? stored.doneAt : null;
+    usedIds.add(id);
+    usedNames.add(nameKey('daily', name.toLocaleLowerCase()));
+    out.push({ id, type: 'daily', name, doneAt, locked: true });
+  }
+  for (const [id, name] of STANDALONE_REQUIRED_TASKS) {
     const stored = list.find(item => isPlainObject(item) && item.id === id);
     const doneAt = stored && Number.isFinite(stored.doneAt) && stored.doneAt >= 0 ? stored.doneAt : null;
     usedIds.add(id);
@@ -199,8 +213,9 @@ export function setDone(id, done) {
 
 export function setGroupDone(type, done) {
   const now = Date.now();
+  const missionIds = new Set(LOCKED_TASKS.map(([id]) => id));
   state.tasks.forEach(t => {
-    if (t.type === type) t.doneAt = done ? now : null;
+    if (t.type === type && missionIds.has(t.id)) t.doneAt = done ? now : null;
   });
   saveState();
 }
@@ -220,4 +235,31 @@ export function restoreTicks(snapshot) {
     if (snapshot.has(t.id)) t.doneAt = snapshot.get(t.id);
   });
   saveState();
+}
+
+export function exportState() {
+  return JSON.stringify(state, null, 2);
+}
+
+export function importState(text) {
+  try {
+    if (typeof text !== 'string' || text.length > MAX_STORED) throw new Error('bad format');
+    const parsed = JSON.parse(text);
+    if (!parsed || !Array.isArray(parsed.tasks)) throw new Error('bad format');
+    const incoming = normalizeTasks(parsed.tasks);
+    const merged = [...state.tasks];
+    let added = 0;
+    for (const t of incoming) {
+      if (t.locked) continue;
+      if (merged.some(m => nameKey(m.type, m.name) === nameKey(t.type, t.name))) continue;
+      if (merged.length >= MAX_TASKS) break;
+      merged.push(t);
+      added++;
+    }
+    state.tasks = merged;
+    saveState();
+    return { added, total: state.tasks.length };
+  } catch (e) {
+    return null;
+  }
 }

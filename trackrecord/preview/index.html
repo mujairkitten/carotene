@@ -294,7 +294,7 @@
       <button class="modal-close" id="about-close" aria-label="Close About">✕</button>
     </div>
     <div class="version-badge">
-      <div class="version-item"><span>Version</span><strong>v5.0.4</strong></div>
+      <div class="version-item"><span>Version</span><strong>v5.0.5</strong></div>
       <span class="version-divider" aria-hidden="true">|</span>
       <div class="version-item"><span>Database</span><strong>v2610a</strong></div>
     </div>
@@ -312,11 +312,11 @@
       </div>
       <div class="about-section about-links">
         <div class="about-section-label">More</div>
-        <p>Want to return to the stable build? Open the <a href="../">Main version <span>(current version: v5.0.4)</span></a>.</p>
+        <p>Want to return to the stable build? Open the <a href="../">Main version <span>(current version: v5.0.5)</span></a>.</p>
         <p class="about-credit">2026, Mujairkitten · Made with various AI tools · Not affiliated with Cygames.<br>Source code is licensed under GPL-3. Uma icons follow <a href="https://umamusume.com/fan-createdguide" rel="noopener noreferrer">Cygames' Fan Content Guide</a>.</p>
       </div>
       <div id="kao-banner"></div>
-      <script src="../kao-banner.js?id=kao-banner&amp;size=mini"></script>
+      <script src="../../kao-banner.js?id=kao-banner&amp;size=mini"></script>
     </div>
   </div>
 </div>
@@ -327,19 +327,20 @@
       <h2 class="modal-title" id="backup-title">Backup</h2>
       <button class="modal-close" id="backup-close" aria-label="Close Backup">✕</button>
     </div>
-    <div class="cal-tabs" id="backup-tabs" role="tablist" aria-label="Backup mode">
-      <button class="cal-tab-btn active" id="backup-tab-export" data-tab="export" role="tab" aria-selected="true" aria-controls="backup-export-panel">Export</button>
-      <button class="cal-tab-btn" id="backup-tab-import" data-tab="import" role="tab" aria-selected="false" aria-controls="backup-import-panel">Import</button>
-    </div>
-    <div id="backup-export-panel" role="tabpanel" aria-labelledby="backup-tab-export">
+    <div class="backup-section">
+      <div class="backup-section-label">Export</div>
+      <p>Save your list to a file or copy it. Keep it somewhere safe — you can import it again on another device or after clearing browser data.</p>
       <textarea class="backup-textarea" id="backup-export-text" readonly spellcheck="false" aria-label="Exported list JSON"></textarea>
-      <div class="backup-export-meta"><span id="backup-export-stamp" aria-live="polite"></span></div>
       <div class="backup-import-actions">
         <button class="btn small" id="backup-copy-btn">Copy</button>
         <button class="btn small" id="backup-export-file-btn">Export file</button>
       </div>
+      <div class="backup-export-meta"><span id="backup-export-stamp" aria-live="polite"></span></div>
     </div>
-    <div id="backup-import-panel" style="display:none;" role="tabpanel" aria-labelledby="backup-tab-import">
+    <hr class="backup-divider" aria-hidden="true">
+    <div class="backup-section">
+      <div class="backup-section-label">Import</div>
+      <p>Paste an exported list, or choose a file. Trainees already in your list are skipped; duplicates are not added.</p>
       <textarea class="backup-textarea" id="backup-import-text" placeholder="Paste your exported JSON here…" spellcheck="false" aria-label="Pasted backup JSON"></textarea>
       <div class="backup-error" id="backup-import-error" role="alert" hidden></div>
       <div class="backup-import-actions">

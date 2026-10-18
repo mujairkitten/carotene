@@ -384,16 +384,6 @@ function refreshBackupExportText() {
 export function openBackupModal() {
   closeSettingsPanel();
   const backupOverlay = document.getElementById('backup-overlay');
-  const exportPanel = document.getElementById('backup-export-panel');
-  const importPanel = document.getElementById('backup-import-panel');
-  const tabs = document.querySelectorAll('#backup-tabs .cal-tab-btn');
-  tabs.forEach(t => {
-    const on = t.dataset.tab === 'export';
-    t.classList.toggle('active', on);
-    t.setAttribute('aria-selected', on ? 'true' : 'false');
-  });
-  if (exportPanel) exportPanel.style.display = '';
-  if (importPanel) importPanel.style.display = 'none';
   refreshBackupExportText();
   openModal(backupOverlay);
 }
@@ -437,10 +427,6 @@ function startExportCooldown() {
 export function wireBackupModal() {
   const backupOverlay = document.getElementById('backup-overlay');
   const backupClose = document.getElementById('backup-close');
-  const tabsEl = document.getElementById('backup-tabs');
-  const tabs = document.querySelectorAll('#backup-tabs .cal-tab-btn');
-  const exportPanel = document.getElementById('backup-export-panel');
-  const importPanel = document.getElementById('backup-import-panel');
   const exportFileBtn = document.getElementById('backup-export-file-btn');
   const importTextBtn = document.getElementById('backup-import-text-btn');
   const importTextarea = document.getElementById('backup-import-text');
@@ -452,21 +438,6 @@ export function wireBackupModal() {
     });
   }
   if (backupClose) backupClose.addEventListener('click', closeBackupModal);
-
-  if (tabsEl) wireTabArrowNav(tabsEl);
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => {
-        const on = t === tab;
-        t.classList.toggle('active', on);
-        t.setAttribute('aria-selected', on ? 'true' : 'false');
-      });
-      const isExport = tab.dataset.tab === 'export';
-      if (exportPanel) exportPanel.style.display = isExport ? '' : 'none';
-      if (importPanel) importPanel.style.display = isExport ? 'none' : '';
-      if (isExport) refreshBackupExportText();
-    });
-  });
 
   if (exportFileBtn) exportFileBtn.addEventListener('click', () => {
     if (Date.now() < exportCooldownUntil) {

@@ -352,7 +352,7 @@ a.tool:focus-visible .tool-more {
   align-items: center;
   justify-content: space-between;
   gap: .75rem;
-  padding: .75rem 2rem calc(.75rem + env(safe-area-inset-bottom));
+  padding: .4rem 2rem calc(.4rem + env(safe-area-inset-bottom));
   background: var(--faux-glass-card-bg);
   border-top: 2px solid var(--accent);
 }
@@ -383,17 +383,17 @@ body.dirt .dock-edge-dirt { display: block; }
 .dock-nav {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px;
-  border-radius: 16px;
+  gap: 4px;
+  padding: 2px;
+  border-radius: 15px;
   background: color-mix(in srgb, var(--panel-2) 80%, transparent);
   border: 1px solid var(--glass-border);
 }
 
 .dock-about {
-  padding: .5rem .875rem;
+  padding: .3rem .75rem;
   border-radius: 12px;
-  font-size: .8125rem;
+  font-size: .75rem;
   font-weight: 600;
   color: var(--ink-dim);
   text-decoration: none;
@@ -412,8 +412,8 @@ body.dirt .dock-edge-dirt { display: block; }
   flex: 0 0 auto;
   display: grid;
   place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2rem;
+  height: 2rem;
   padding: 0;
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -424,8 +424,8 @@ body.dirt .dock-edge-dirt { display: block; }
 }
 
 .dock-btn svg {
-  width: 1.125rem;
-  height: 1.125rem;
+  width: 1rem;
+  height: 1rem;
   display: block;
 }
 

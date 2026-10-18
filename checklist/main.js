@@ -1,8 +1,9 @@
 import {
   state, TYPES, RESETS, MAX_TASKS, loadState, addTask, removeTask, restoreTask, setDone,
-  clearTicks, restoreTicks, setGroupDone, periodStart, nextReset, isDone, escapeHtml, escapeAttr
+  clearTicks, restoreTicks, setGroupDone, periodStart, nextReset, isDone, escapeHtml, escapeAttr,
+  exportState, importState, LOCKED_TASKS, STANDALONE_REQUIRED_TASKS
 } from './core.js';
-import { initChrome, toast, announce } from './shell.js';
+import { initChrome, toast, announce, ui, saveUi, closeSettings } from './shell.js';
 
 const SECTIONS = {
   daily: { title: 'Daily', empty: 'No daily tasks yet.', placeholder: 'Add an extra daily mission…' },
@@ -75,16 +76,23 @@ function statsFor(type, now) {
 
 function sectionHtml(type, now) {
   const info = SECTIONS[type];
-  const { tasks, done, total, pct } = statsFor(type, now);
+  const allTasks = state.tasks.filter(t => t.type === type);
+  const { done, total, pct } = statsFor(type, now);
   const isCollapsed = collapsed.has(type);
   const desc = type === 'once'
     ? 'Never resets. Untick or remove tasks yourself.'
     : `Resets in <strong id="cd-${type}">${formatDuration(nextReset(type, now) - now)}</strong> <span class="desc-note">(${escapeHtml(resetNote(type, now))})</span>`;
-  const list = type === 'daily'
-    ? missionHtml(tasks, now)
-    : total
-      ? tasks.map(t => taskHtml(t, now, false)).join('')
+  let list;
+  if (type === 'daily') {
+    const missionIds = new Set(LOCKED_TASKS.map(([id]) => id));
+    const missionTasks = allTasks.filter(t => missionIds.has(t.id));
+    const otherTasks = allTasks.filter(t => !missionIds.has(t.id));
+    list = missionHtml(missionTasks, now) + otherTasks.map(t => taskHtml(t, now, false)).join('');
+  } else {
+    list = total
+      ? allTasks.map(t => taskHtml(t, now, false)).join('')
       : `<div class="empty-line">${info.empty}</div>`;
+  }
   return `
   <section class="block">
     <div class="block-head">
@@ -147,15 +155,18 @@ function syncSection(type) {
     cb.closest('.trophy-item')?.classList.toggle('checked', done);
   });
   if (type === 'daily') {
-    const { done, total } = statsFor('daily', now);
+    const missionIds = new Set(LOCKED_TASKS.map(([id]) => id));
+    const missionTasks = state.tasks.filter(t => t.type === 'daily' && missionIds.has(t.id));
+    const missionDone = missionTasks.filter(t => isDone(t, now)).length;
+    const missionTotal = missionTasks.length;
     const grp = document.getElementById('grp-daily');
     if (grp) {
-      grp.checked = total > 0 && done === total;
-      grp.indeterminate = done > 0 && done < total;
+      grp.checked = missionTotal > 0 && missionDone === missionTotal;
+      grp.indeterminate = missionDone > 0 && missionDone < missionTotal;
       grp.closest('.trophy-item')?.classList.toggle('checked', grp.checked);
     }
     const gc = document.getElementById('gcount-daily');
-    if (gc) gc.textContent = `${done}/${total}`;
+    if (gc) gc.textContent = `${missionDone}/${missionTotal}`;
   }
   updateProgress(type);
 }
@@ -211,6 +222,8 @@ function wireSections() {
       const type = toggle.dataset.collapse;
       const open = collapsed.has(type);
       if (open) collapsed.delete(type); else collapsed.add(type);
+      ui.collapsed = Array.from(collapsed);
+      saveUi();
       const body = document.getElementById(`body-${type}`);
       if (body) body.hidden = !open;
       const info = SECTIONS[type];
@@ -261,12 +274,149 @@ function wireUntickAll() {
   });
 }
 
+function wireBackup() {
+  const btn = document.getElementById('backup-btn');
+  const overlay = document.getElementById('backup-overlay');
+  const closeBtn = document.getElementById('backup-close');
+  const exportText = document.getElementById('backup-export-text');
+  const exportStamp = document.getElementById('backup-export-stamp');
+  const copyBtn = document.getElementById('backup-copy-btn');
+  const exportFileBtn = document.getElementById('backup-export-file-btn');
+  const importText = document.getElementById('backup-import-text');
+  const importError = document.getElementById('backup-import-error');
+  const importTextBtn = document.getElementById('backup-import-text-btn');
+  const importFileInput = document.getElementById('backup-import-file');
+
+  if (!btn || !overlay) return;
+
+  function setImportError(message) {
+    if (importText) {
+      if (message) importText.setAttribute('aria-invalid', 'true');
+      else importText.removeAttribute('aria-invalid');
+    }
+    if (!importError) return;
+    if (message) {
+      importError.textContent = message;
+      importError.hidden = false;
+    } else {
+      importError.textContent = '';
+      importError.hidden = true;
+    }
+  }
+
+  function openBackup() {
+    closeSettings();
+    overlay.classList.add('show');
+    if (closeBtn) closeBtn.focus();
+    refreshBackupExport();
+  }
+
+  function closeBackup() {
+    overlay.classList.remove('show');
+    setImportError('');
+  }
+
+  function refreshBackupExport() {
+    if (exportText) exportText.value = exportState();
+    if (exportStamp) {
+      const d = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      exportStamp.textContent = `Generated ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())} · ${state.tasks.length} tasks`;
+    }
+  }
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openBackup();
+  });
+
+  if (closeBtn) closeBtn.addEventListener('click', closeBackup);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeBackup(); });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (overlay.classList.contains('show')) {
+      e.stopPropagation();
+      closeBackup();
+      if (btn) btn.focus();
+    }
+  });
+
+  if (copyBtn) copyBtn.addEventListener('click', async () => {
+    if (!exportText) return;
+    try {
+      await navigator.clipboard.writeText(exportText.value);
+      toast('Backup JSON copied to clipboard.');
+    } catch (_) {
+      exportText.select();
+      try {
+        document.execCommand('copy');
+        toast('Backup JSON copied to clipboard.');
+      } catch (__) {
+        toast('Copy failed — select the text manually.', { kind: 'error' });
+      }
+    }
+  });
+
+  if (exportFileBtn) exportFileBtn.addEventListener('click', () => {
+    if (!exportText) return;
+    const blob = new Blob([exportText.value], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const d = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    const name = `Checklist-${pad(d.getFullYear() % 100)}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}.json`;
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast(`Exported ${state.tasks.length} tasks.`);
+  });
+
+  if (importTextBtn) importTextBtn.addEventListener('click', () => {
+    if (!importText) return;
+    const text = importText.value.trim();
+    if (!text) { toast('Paste an export first, then import.'); importText.focus(); return; }
+    const res = importState(text);
+    if (res) {
+      importText.value = '';
+      setImportError('');
+      render();
+      toast(`Imported ${res.added} task${res.added === 1 ? '' : 's'} (${res.total} total).`);
+    } else {
+      setImportError("Couldn't read that — expected a Checklist export. Nothing was changed.");
+    }
+  });
+
+  if (importText) importText.addEventListener('input', () => setImportError(''));
+
+  if (importFileInput) importFileInput.addEventListener('change', e => {
+    if (e.target.files[0]) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const res = importState(reader.result);
+        if (res) {
+          importFileInput.value = '';
+          setImportError('');
+          render();
+          toast(`Imported ${res.added} task${res.added === 1 ? '' : 's'} (${res.total} total).`);
+        } else {
+          setImportError("Couldn't read that file — expected a Checklist export. Nothing was changed.");
+        }
+      };
+      reader.readAsText(e.target.files[0]);
+    }
+    e.target.value = '';
+  });
+}
+
 function init() {
   initChrome();
   loadState();
+  ui.collapsed.forEach(type => collapsed.add(type));
   render();
   wireSections();
   wireUntickAll();
+  wireBackup();
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) stopTimer(); else startTimer();
   });

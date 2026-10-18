@@ -34,12 +34,14 @@ function normalize(text, isPreview) {
   if (isPreview) {
     out = out
       .replaceAll('../favicon.svg', './favicon.svg')
-      .replaceAll('../kao-banner.js', 'kao-banner.js')
+      .replaceAll('../../kao-banner.js', '../kao-banner.js')
       .replaceAll('../data/', './data/')
       .replaceAll('../icons/', './icons/')
       .replaceAll('href="../../"', 'href="../"')
       .replaceAll('href="../../checklist/"', 'href="../checklist/"');
   }
+  // Kao banner now lives at root; both builds reference it from different depths.
+  out = out.replaceAll('../kao-banner.js', 'kao-banner.js');
   // Build tag: console.info('build v5.0.2'); vs console.info('[preview] build v5.0.4');
   out = out.replace(
     /console\.info\('.*?build .*?'\);/g,
