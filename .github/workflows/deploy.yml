@@ -187,11 +187,11 @@ jobs:
           # Carotene hub: ./style.css, ./favicon.svg, ./hub.js
           sed -i "s#href=\"./style.css\"#href=\"./style.css?v=${TAG}\"#; s#href=\"./favicon.svg\"#href=\"./favicon.svg?v=${TAG}\"#; s#src=\"./hub.js\"#src=\"./hub.js?v=${TAG}\"#" deploy/index.html
 
-          # Track Record: main.js, style.css, ./favicon.svg, kao-banner.js
-          sed -i "s#src=\"main.js\"#src=\"main.js?v=${TAG}\"#; s#href=\"style.css\"#href=\"style.css?v=${TAG}\"#; s#href=\"./favicon.svg\"#href=\"./favicon.svg?v=${TAG}\"#; s#src=\"kao-banner.js?id=#src=\"kao-banner.js?v=${TAG}\&id=#" deploy/trackrecord/index.html
+          # Track Record: main.js, style.css, ./favicon.svg, ../kao-banner.js
+          sed -i "s#src=\"main.js\"#src=\"main.js?v=${TAG}\"#; s#href=\"style.css\"#href=\"style.css?v=${TAG}\"#; s#href=\"./favicon.svg\"#href=\"./favicon.svg?v=${TAG}\"#; s#src=\"../kao-banner.js?id=#src=\"../kao-banner.js?v=${TAG}\&id=#" deploy/trackrecord/index.html
 
           # Track Record preview: same as the app but reaching up with ../
-          sed -i "s#src=\"main.js\"#src=\"main.js?v=${TAG}\"#; s#href=\"style.css\"#href=\"style.css?v=${TAG}\"#; s#href=\"../favicon.svg\"#href=\"../favicon.svg?v=${TAG}\"#; s#src=\"../kao-banner.js?id=#src=\"../kao-banner.js?v=${TAG}\&id=#" deploy/trackrecord/preview/index.html
+          sed -i "s#src=\"main.js\"#src=\"main.js?v=${TAG}\"#; s#href=\"style.css\"#href=\"style.css?v=${TAG}\"#; s#href=\"../favicon.svg\"#href=\"../favicon.svg?v=${TAG}\"#; s#src=\"../../kao-banner.js?id=#src=\"../../kao-banner.js?v=${TAG}\&id=#" deploy/trackrecord/preview/index.html
 
           # Checklist: same layout as preview but without kao-banner
           sed -i "s#src=\"main.js\"#src=\"main.js?v=${TAG}\"#; s#href=\"style.css\"#href=\"style.css?v=${TAG}\"#; s#href=\"../favicon.svg\"#href=\"../favicon.svg?v=${TAG}\"#" deploy/checklist/index.html
