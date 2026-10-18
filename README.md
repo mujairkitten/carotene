@@ -33,8 +33,8 @@ Trainee icons are WebP.
 
 * `tools/check-imports.mjs` — verifies every ES module import resolves to a real export
 * `tools/check-preview-sync.mjs` — verifies Track Record preview/ mirrors stable/
+* `docs/validation-scripts.md` — behavior and scope documentation for both scripts
 
 ## License
 
 Source code is licensed under GPL-3. Icons are exempt (not the author's work; fall under [Cygames' Umamusume: Pretty Derby Fan-Created Content Guidelines](https://umamusume.com/fan-createdguide)).
-
