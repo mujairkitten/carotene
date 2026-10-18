@@ -1,42 +1,7 @@
-/**
- * Keep Android Open – Countdown Banner
- * Licensed under the GNU General Public License v3.0
- * SPDX-License-Identifier: GPL-3.0-only
- *
- * A self-contained, embeddable script that injects a countdown banner into any
- * web page. No external dependencies.
- *
- * Usage:
- *   <script src="https://keepandroidopen.org/banner.js"></script>
- *
- * Query parameters (appended to the script src URL):
- *   lang=fr       Override the browser language (default: auto-detected)
- *   id=myDiv      Insert the banner inside the element with this id
- *                 (default: prepend to <body>)
- *   size=normal   Banner size: "normal" (default), "mini" or "minimal"
- *   link=URL      Make the banner text a link (default: https://keepandroidopen.org)
- *                 Set link=none to disable the link
- *   hidebutton=on Show an X close button (default: on)
- *                 Set hidebutton=off to hide the close button
- *   animation=on  Add animation to border of banner (default: on)
- *                 Set animation=off to disable
- *
- * ---------------------------------------------------------------------------
- * TrackRecord vendor notes (2026-10-03): this copy is synchronized with
- * https://keepandroidopen.org/banner.js (original), plus the following
- * local hardening changes:
- *   - The 1s countdown interval only ticks while the banner is actually
- *     visible (IntersectionObserver), instead of for the page lifetime.
- *   - Post-deadline, the countdown clamps at zero instead of rendering
- *     negative values for one tick.
- *   - The close button's aria-label is localised per banner locale.
- *   - The banner link uses rel="noopener noreferrer".
- * ---------------------------------------------------------------------------
- */
+
 (function () {
   "use strict";
 
-  // ── Localized banner strings ──────────────────────────────────────────
   var messages = {
     fa:      "اندروید، یک سکّوی بسته خواهد شد!",
     ar:      "سيصبح نظام أندرويد منصة مغلقة في",
@@ -72,7 +37,6 @@
     hi:      "Android एक बंद इकोसिस्टम बन जाएगा"
   };
 
-  // ── Localized "Close" labels for the dismiss button ────────────────────
   var closeMessages = {
     fa:      "بستن",
     ar:      "إغلاق",
@@ -108,7 +72,6 @@
     hi:      "बंद करें"
   };
 
-  // ── Parse query parameters from the script's own src URL ──────────────
   function getScriptParams() {
     var params = {};
     try {
@@ -127,22 +90,21 @@
 
   var params = getScriptParams();
 
-  // ── Determine locale ──────────────────────────────────────────────────
   function resolveLocale(tag) {
     if (!tag) return "en";
-    // Exact match
+
     if (messages[tag]) return tag;
-    // Case-insensitive exact match (e.g. "pt-br" → "pt-BR")
+
     var lower = tag.toLowerCase();
     for (var key in messages) {
       if (key.toLowerCase() === lower) return key;
     }
-    // Fallback to base language (e.g. "de-CH" → "de", "zh-Hans" → "zh")
+
     var base = lower.split("-")[0];
     for (var key2 in messages) {
       if (key2.toLowerCase() === base) return key2;
     }
-    // Fallback to any regional variant of the base language (e.g. "pt" → "pt-BR")
+
     for (var key3 in messages) {
       if (key3.toLowerCase().split("-")[0] === base) return key3;
     }
@@ -156,23 +118,19 @@
     navigator.userLanguage
   );
 
-  // ── Size variant ──────────────────────────────────────────────────────
   var size = params.size === "mini" ? "mini"
       : params.size === "minimal"
         ? "minimal"
         : "normal";
 
-  // ── Link ────────────────────────────────────────────────────────────
   var linkParam = params.link;
   var defaultLink = "https://keepandroidopen.org" + (locale === "en" ? "" : "/" + locale + "/");
   var linkUrl = linkParam === "none" ? null : (linkParam || defaultLink);
 
-  // ── Close button ────────────────────────────────────────────────────
   var showClose = params.hidebutton !== "off";
   var storageKey = "kao-banner-hidden";
   var dismissDays = 30;
 
-  // ── Inject CSS ────────────────────────────────────────────────────────
   var cssNormal =
     ".kao-banner{" +
       "position:relative;" +
@@ -275,7 +233,6 @@
     + cssCommon;
   document.head.appendChild(style);
 
-  // ── Check if previously dismissed (reappears after dismissDays) ─────
   if (showClose) {
     try {
       var dismissed = localStorage.getItem(storageKey);
@@ -287,7 +244,6 @@
     } catch (e) {}
   }
 
-  // ── Create banner DOM ─────────────────────────────────────────────────
   var banner = document.createElement("div");
   banner.className = params.animation === "off" ? "kao-banner no-animation" : "kao-banner";
 
@@ -314,7 +270,6 @@
   countdownSpan.textContent = "\u00A0";
   banner.appendChild(countdownSpan);
 
-  // Close button
   if (showClose) {
     var closeBtn = document.createElement("button");
     closeBtn.className = "kao-banner-close";
@@ -327,7 +282,6 @@
     banner.appendChild(closeBtn);
   }
 
-  // Insert into target element (by id) or prepend to <body>
   var targetId = params.id;
   if (targetId) {
     var target = document.getElementById(targetId);
@@ -340,7 +294,6 @@
     document.body.insertBefore(banner, document.body.firstChild);
   }
 
-  // ── Countdown logic ───────────────────────────────────────────────────
   var countDownDate = new Date("Jan 1, 2027 00:00:00").getTime();
 
   var unitFormatters = {
@@ -410,9 +363,6 @@
     }
   }
 
-  // Only tick while the banner is actually visible. In TrackRecord the
-  // banner lives inside the About modal, so without this the 1s interval
-  // would run for the entire page lifetime.
   if (typeof IntersectionObserver === "function") {
     var visibilityObserver = new IntersectionObserver(function (entries) {
       if (entries[0] && entries[0].isIntersecting) startTimer();

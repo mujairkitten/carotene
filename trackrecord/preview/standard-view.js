@@ -569,7 +569,7 @@ export function wireStandardViewControls() {
       const item = e.target && e.target.closest ? e.target.closest('.race-suggest-item') : null;
       if (!item || !wrap.contains(item)) return;
       if (e.type === 'mousedown') e.preventDefault();
-      // mousedown is followed by click — handle once.
+
       const now = Date.now();
       if (e.type === 'click' && item.dataset.race === lastPick.race && now - lastPick.at < 500) return;
       lastPick = { race: item.dataset.race, at: now };
@@ -611,7 +611,7 @@ export function wireStandardViewControls() {
       if (!d || !d.id) return;
       syncCardTrophy(d.id, d.race, d.checked);
     });
-    // Membership changes patch the DB button + counts without rebuilding the grid.
+
     window.addEventListener('cb-db-button', (e) => {
       const d = e && e.detail;
       if (!d || !d.name) return;

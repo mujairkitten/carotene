@@ -59,8 +59,7 @@ function isKnownRaceName(name) {
 function reorderRaceInSlot(t, slotKey, allSlotRaces, draggedName, targetName) {
   if (!isKnownRaceName(draggedName)) return;
   if (targetName && !isKnownRaceName(targetName)) targetName = null;
-  // Dropping a race onto itself is a no-op — without this the row would be
-  // filtered out and re-appended at the end of the slot.
+
   if (targetName && targetName === draggedName) return;
   const pending = allSlotRaces.filter(r => !isRaceDone(t, r.name));
   let ordered = pendingOrderForSlot(t, slotKey, pending).map(r => r.name);
@@ -125,7 +124,7 @@ export function calGradeColor(grade) {
   if (grade === 'G2') return 'var(--g2)';
   return 'var(--g3)';
 }
-// Only G1 blue is dark enough to need white text (G2/G3 read best dark).
+
 export function calGradeFg(grade) {
   return grade === 'G1' ? '#fff' : '#12141a';
 }
@@ -344,13 +343,10 @@ function wireRaceRow(row, t, onChange, root) {
   }
 }
 
-/* ---------- Trainee picker panel ---------- */
-
 function calTraineeListsHtml(activeTrainee) {
   const q = calTraineeSearch.trim().toLowerCase();
   const mineRows = sortTraineeRows(state.myList.filter(t => t.name.toLowerCase().includes(q)));
-  // N2: use the same canonical key as addToMyList so DB names that normalise
-  // to an existing entry are excluded from "All trainees".
+
   const myKeys = new Set(state.myList.map(t => traineeNameKey(t.name)));
   const otherRows = sortTraineeRows(DATABASE.filter(d => !myKeys.has(traineeNameKey(d.name)) && d.name.toLowerCase().includes(q)));
 
@@ -380,7 +376,7 @@ function calTraineeListsHtml(activeTrainee) {
 }
 
 function calTraineePanelHtml(activeTrainee) {
-  // N9: this is a popover, not a modal — use `region` for the label to be valid.
+
   return `
   <div class="cal-trainee-panel" id="cal-trainee-panel" role="region" aria-label="Choose trainee">
     <input type="text" class="search" id="cal-trainee-search" placeholder="Search trainees…" value="${escapeAttr(calTraineeSearch)}" autocomplete="off" aria-label="Search trainees">
@@ -548,7 +544,7 @@ function wireCalLocate(host, t) {
     const item = e.target.closest('.race-suggest-item');
     if (!item) return;
     if (e.type === 'mousedown') e.preventDefault();
-    // mousedown is followed by click — handle once.
+
     const now = Date.now();
     if (e.type === 'click' && item.dataset.race === box._lastPickRace && now - (box._lastPickAt || 0) < 500) return;
     box._lastPickRace = item.dataset.race;
@@ -695,8 +691,7 @@ function wireCalTraineePanel(host, activeTrainee) {
       e.stopPropagation();
       const d = DATABASE.find(x => x.name === addBtn.dataset.addswitch);
       if (!d) return;
-      // N2: resolve the trainee by canonical key so a name that normalises
-      // to an existing entry doesn't select the wrong card.
+
       const wantedKey = traineeNameKey(d.name);
       addToMyList(d.name, JSON.parse(JSON.stringify(d.apt)), { announce: false });
       const added = state.myList.find(t => traineeNameKey(t.name) === wantedKey);
@@ -748,8 +743,7 @@ export function renderCalendarView() {
   } else {
     activeTrainee = state.myList.find(t => t.id === state.settings.activeTraineeId);
     if (!activeTrainee) {
-      // N3: fall back without persisting — render stays pure.
-      // Storage-level healing happens in removeFromMyList / importListFromText.
+
       activeTrainee = state.myList[0];
     }
   }

@@ -188,7 +188,6 @@ export function normalizeSettings(value, trainees) {
   }
   settings.colorTheme = raw.colorTheme === 'dirt' ? 'dirt' : 'turf';
 
-  // Migration: legacy single-field `navbarPosition` → two-field model.
   const legacy = ['left', 'bottom', 'right', 'top'].includes(raw.navbarPosition)
     ? raw.navbarPosition
     : null;
@@ -202,7 +201,7 @@ export function normalizeSettings(value, trainees) {
   if (['top', 'bottom'].includes(mobileRaw)) {
     settings.navbarPositionMobile = mobileRaw;
   } else {
-    // Legacy 'left'/'right' has no mobile equivalent — the visual default is bottom.
+
     settings.navbarPositionMobile = 'bottom';
   }
 
@@ -247,9 +246,9 @@ export async function loadState() {
 let saveTimer = null;
 let saveFlush = null;
 export function saveState() {
-  // Never autosave over data we failed to load (would destroy it).
+
   if (!storageHealthy) return Promise.resolve();
-  // Coalesce rapid toggles/drags into one trailing write; snapshot at flush.
+
   if (!saveFlush) {
     saveFlush = new Promise((resolve) => {
       saveTimer = setTimeout(async () => {
@@ -274,7 +273,7 @@ export function saveState() {
               : "Couldn't save your list in this browser.";
             try {
               window.dispatchEvent(new CustomEvent('cb-toast', { detail: { message, kind: 'error', duration: isQuota ? 0 : 5000 } }));
-            } catch (_) { /* ignore toast bridge failures */ }
+            } catch (_) {  }
           }
         });
         await saveQueue;
@@ -286,8 +285,6 @@ export function saveState() {
   return saveFlush;
 }
 
-/* Re-run a render while keeping keyboard focus on the invoking control.
- * Matches by stable id, else by data attrs within the same id'd container. */
 export function withFocusKept(fn) {
   const a = typeof document !== 'undefined' ? document.activeElement : null;
   let restore = null;
@@ -313,12 +310,9 @@ export function withFocusKept(fn) {
     }
   }
   fn();
-  try { restore?.(); } catch (_) { /* focus restore is best-effort */ }
+  try { restore?.(); } catch (_) {  }
 }
 
-/* ---------- Escaping ---------- */
-// escapeHtml is for text nodes / element content (does NOT escape quotes).
-// escapeAttr is for anything interpolated into an HTML attribute value.
 const HTML_ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 export function escapeHtml(str) {
   return String(str).replace(/[&<>]/g, ch => HTML_ESCAPES[ch]);
@@ -330,7 +324,6 @@ export function escapeAttr(str) {
 export function gradeOf(v) { return typeof v === 'string' ? v : v.base; }
 function altOf(v) { return typeof v === 'string' ? null : v; }
 
-/* ---------- Tooltip ---------- */
 let tooltipEl = null;
 let tooltipTarget = null;
 function ensureTooltipEl() {
@@ -352,7 +345,7 @@ function positionTooltip(target) {
   el.style.left = left + "px";
   let top = rect.top - tooltipHeight - gap;
   if (top < gap) top = rect.bottom + gap;
-  // Clamp bottom edge so flipped-below tooltips stay onscreen.
+
   top = Math.min(top, window.innerHeight - tooltipHeight - gap);
   if (top < gap) top = gap;
   el.style.top = Math.max(top, gap) + "px";
@@ -409,7 +402,6 @@ function repositionTooltip() {
   positionTooltip(tooltipTarget);
 }
 
-// Scroll events do not bubble from nested scrollers, so capture them at document level.
 document.addEventListener('scroll', repositionTooltip, true);
 window.addEventListener('resize', repositionTooltip);
 
@@ -431,7 +423,7 @@ function chipHtml(apt, key) {
     bg = `linear-gradient(90deg, color-mix(in srgb, var(--${tier}) 26%, transparent) 50%, color-mix(in srgb, var(--${altTier}) 26%, transparent) 50%)`;
   }
   const style = `--chip-bg:${bg};--chip-border:${borderMix};--chip-glow:${glowMix};`;
-  // N6: escapeAttr round-trips correctly for any string (including literal `&amp;`).
+
   const safeJson = escapeAttr(JSON.stringify(value));
   return `<span class="chip" tabindex="0" style="${style}" data-cat="${key}" data-json='${safeJson}' aria-label="${escapeAttr(ariaLabel)}" aria-describedby="tooltip">${label}</span>`;
 }
@@ -458,7 +450,7 @@ export function wireChips(root) {
       if (chip.contains(e.relatedTarget)) return;
       try {
         showTooltip(chip, chip.dataset.cat, JSON.parse(chip.dataset.json));
-      } catch (_) { /* ignore tampered chip payloads */ }
+      } catch (_) {  }
       return;
     }
     const iconBtn = e.target.closest('[data-tooltip]');
@@ -485,7 +477,7 @@ export function wireChips(root) {
     if (chip && root.contains(chip)) {
       try {
         showTooltip(chip, chip.dataset.cat, JSON.parse(chip.dataset.json));
-      } catch (_) { /* ignore tampered chip payloads */ }
+      } catch (_) {  }
       return;
     }
     const iconBtn = e.target.closest('[data-tooltip]');
@@ -513,7 +505,7 @@ export function iconHtml(name, size) {
   const slug = slugify(name);
   const px = Math.min(96, Math.max(16, Number(size) || 32));
   const initial = escapeHtml((name.trim()[0] || '?').toUpperCase());
-  // Custom names have no icon file — render the fallback directly, no 404.
+
   const img = KNOWN_ICON_SLUGS.has(slug)
     ? `<img src="../icons/${slug}.webp" alt="" loading="lazy" decoding="async">`
     : '';
@@ -543,7 +535,6 @@ export function sortRowsByMode(rows, mode) {
   return rows;
 }
 
-/* ---------- Shared trainee-name canonicalisation ---------- */
 export function traineeNameKey(name) {
   return (name || "")
     .normalize('NFKC')
@@ -552,7 +543,6 @@ export function traineeNameKey(name) {
     .toLocaleLowerCase();
 }
 
-/* ---------- Race helpers ---------- */
 const RACE_BY_NAME = new Map(RACES.map(r => [(r.name || "").trim().toLowerCase(), r]));
 export function findRaceByExactName(name) {
   const q = (name || "").trim().toLowerCase();
@@ -564,8 +554,6 @@ export function raceMeta(race) {
     year: race.year, turn: race.turn, month: race.month
   };
 }
-
-/* ---------- State actions (render via bus to avoid cycles) ---------- */
 
 export function addToMyList(name, apt, opts = {}) {
   const { announce = true } = opts;
@@ -692,10 +680,6 @@ export function addTrophyFromInput(tid, rawName) {
   return addTrophy(tid, name, race ? raceMeta(race) : null);
 }
 
-/* Contrast-checked tag foregrounds (measured 2026-09-20):
- * bright tier greens/yellow/orange (a-f, g3) read best with dark text
- * (6-12:1 vs 1.5-3:1 for white); only the dark bgs g (#c23f5a, 5.06:1)
- * and g1 (#2f6fd0, 4.88:1) need white text. */
 const LIGHT_TEXT_TAG_VARS = new Set(['g1', 'g']);
 export function tagFgForVar(varName) {
   return LIGHT_TEXT_TAG_VARS.has(varName) ? '#fff' : '#12141a';
@@ -721,11 +705,6 @@ export function wireTabArrowNav(container) {
   });
 }
 
-/* ---------- Toast (undo + status) ----------
- * Stacked; plain toasts cap at MAX_TOASTS while action toasts (Undo/View)
- * are exempt up to MAX_ACTION_TOASTS so rapid deletes never eat recovery.
- * Error toasts share one slot so bursts can't pile up or clobber Undo;
- * auto-dismiss waits out :focus-within; duration<=0 never auto-dismisses. */
 const MAX_TOASTS = 3;
 const MAX_ACTION_TOASTS = 6;
 let errorToast = null;
@@ -744,8 +723,7 @@ function armToastDismiss(el, duration) {
 export function showToast(message, opts = {}) {
   let region = document.getElementById('toast-region');
   if (!region) {
-    // Self-heal: older cached HTML may lack the region — create it so
-    // toasts never silently vanish.
+
     region = document.createElement('div');
     region.id = 'toast-region';
     region.className = 'toast-region';
@@ -768,7 +746,7 @@ export function showToast(message, opts = {}) {
   }
   const el = document.createElement('div');
   el.className = 'toast';
-  // No role=status here: the region itself is the single live source.
+
   const text = document.createElement('span');
   text.textContent = message;
   el.appendChild(text);
@@ -800,7 +778,6 @@ window.addEventListener('cb-toast', (e) => {
   showToast(detail.message || 'Something happened.', { kind: detail.kind || 'info', duration: detail.duration ?? 5000 });
 });
 
-/* Polite one-shot announcements for silent visual toggles (no toast spam). */
 export function announce(message) {
   let el = document.getElementById('sr-announcer');
   if (!el) {

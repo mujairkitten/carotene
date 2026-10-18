@@ -1,5 +1,4 @@
-// Late-bound render callbacks used to break circular imports between
-// view modules. main.js installs the real implementations during init().
+
 
 const handlers = {
   mainView: () => {},
