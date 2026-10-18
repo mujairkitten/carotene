@@ -97,10 +97,6 @@ async function init() {
       toggleSettingsPanel();
     });
 
-    // Settings-panel-scoped click handler: keeps clicks inside the panel
-    // from closing it, AND routes nav-position button clicks. The old
-    // document-level delegation never fired because stopPropagation()
-    // killed the event before it reached document.
     settingsPanel.addEventListener('click', (e) => {
       e.stopPropagation();
       const navBtn = e.target.closest('.nav-pos-btn');
@@ -196,8 +192,7 @@ async function init() {
     closeBackupModal();
     closeSettingsPanel();
     if (closeCalTraineePanel()) document.getElementById('cal-trainee-btn')?.focus();
-    // Return focus to the invoking button so keyboard users don't lose
-    // their place when a popover is dismissed.
+
     if (settingsWasOpen) document.getElementById('settings-btn')?.focus();
     else if (caroteneWasOpen) document.getElementById('carotene-btn')?.focus();
   });

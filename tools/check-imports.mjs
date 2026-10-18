@@ -1,52 +1,14 @@
 #!/usr/bin/env node
-/**
- * check-imports.mjs - verify every ES module import resolves to a real export.
- *
- * Why this exists: `node --check` parses each file in isolation and terser
- * does not bundle, so NEITHER catches an import naming a symbol the target
- * module does not export. That mistake passes CI green and then throws
- *
- *   SyntaxError: The requested module './core.js' does not provide an
- *   export named 'typoedName'
- *
- * in the browser - i.e. a blank page for every visitor. This closes that gap.
- *
- * Usage:
- *   node tools/check-imports.mjs [dir ...]     (default: current directory)
- *
- * Exits 0 if every import resolves, 1 otherwise. Failures are printed as
- * GitHub Actions ::error:: annotations so they surface on the commit/PR.
- *
- * Scope note - what this does and does NOT catch:
- *
- *   Catches  - an import naming a symbol the target module does not export
- *              (the blank-page SyntaxError), and an unresolvable module path.
- *   Does NOT - using an identifier that was never imported or declared. That
- *              surfaces as a runtime ReferenceError, not an unresolved
- *              import, and catching it needs real scope analysis (a linter).
- *              For example, deleting `import { renderMainView } from
- *              './render-bus.js'` leaves no broken binding - the check stays
- *              green and the app fails later with "renderMainView is not
- *              defined". Use a linter for that class of mistake.
- *   Does NOT - report "exported but never imported". That judgement is
- *              unsound to automate: a symbol may be legitimately used only
- *              inside its own file, and some references are built at runtime
- *              via string interpolation (e.g. `var(--${tier})`).
- */
 
 import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs';
 import { dirname, join, resolve, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// 'data' is NOT skipped: it holds real ES modules (DATABASE, RACES, ...) whose
-// exports are imported by the view modules. 'icons' is binary, 'tools' holds
-// this script, 'deploy' is build output.
 const SKIP_DIRS = new Set(['node_modules', '.git', 'icons', 'deploy', 'tools', '.github']);
 
 const dirs = process.argv.slice(2);
 if (dirs.length === 0) dirs.push('.');
 
-/** Collect every .js file in a tree, skipping non-source directories. */
 function jsFiles(root) {
   const out = [];
   const walk = d => {
@@ -64,19 +26,15 @@ function jsFiles(root) {
   return out;
 }
 
-/** Extract the export names a module provides. */
 function exportsOf(text) {
   const names = new Set();
 
-  // export [async] function|const|let|var|class NAME
   for (const m of text.matchAll(
     /^[ \t]*export[ \t]+(?:async[ \t]+)?(?:function\*?|const|let|var|class)[ \t]+([A-Za-z_$][\w$]*)/gm
   )) names.add(m[1]);
 
-  // export default ...
   if (/^[ \t]*export[ \t]+default[ \t]/m.test(text)) names.add('default');
 
-  // export { a, b as c } [from '...']
   for (const m of text.matchAll(/^[ \t]*export[ \t]*\{([^}]*)\}/gm)) {
     for (const part of m[1].split(',')) {
       const n = part.split(/\s+as\s+/).pop().trim();
@@ -84,11 +42,9 @@ function exportsOf(text) {
     }
   }
 
-  // export * from './x.js'  -> merge the target's exports (resolved by caller)
   return { names, starFrom: [...text.matchAll(/^[ \t]*export[ \t]*\*[ \t]*from[ \t]*['"]([^'"]+)['"]/gm)].map(m => m[1]) };
 }
 
-/** Extract the imports a module requests: { line, names[], source }. */
 function importsOf(text) {
   const out = [];
   const re = /import\s+([\s\S]*?)\s+from\s*['"]([^'"]+)['"]/g;
@@ -104,7 +60,6 @@ function importsOf(text) {
         if (n) names.push(n);
       }
     }
-    // bare default import: `import Foo from '...'`
     const bare = clause.replace(/\{[\s\S]*\}/, '').replace(/,/g, '').trim();
     if (bare && !bare.startsWith('*')) names.push('default');
 
@@ -131,9 +86,6 @@ for (const dir of dirs) {
     continue;
   }
 
-  // Pass 1: index every module's exports, following `export * from`.
-  // `ensure` also indexes files reached from outside this tree - preview/
-  // imports ../data/*.js, which is not under the preview root.
   const table = new Map();
   const ensure = f => {
     if (table.has(f)) return table.get(f);
@@ -143,7 +95,6 @@ for (const dir of dirs) {
     return info;
   };
   for (const f of files) ensure(f);
-  // second pass for star re-exports, so ordering does not matter
   for (const [f, info] of [...table]) {
     for (const src of info.starFrom) {
       const t = ensure(resolve(dirname(f), src));
@@ -151,12 +102,11 @@ for (const dir of dirs) {
     }
   }
 
-  // Pass 2: verify every import binding.
   const problems = [];
   for (const f of files) {
     const text = readFileSync(f, 'utf8');
     for (const imp of importsOf(text)) {
-      if (!imp.source.startsWith('.')) continue; // bare specifier: external package
+      if (!imp.source.startsWith('.')) continue;
       const target = resolve(dirname(f), imp.source);
       const t = table.get(target) || ensure(target);
       if (!t) {

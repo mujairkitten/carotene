@@ -1,17 +1,4 @@
-/* ------------------------------------------------------------------
- * Z-INDEX SCALE (keep in ascending order):
- *   30  .cal-tabs-main          sticky year-group tabs
- *   40  .cal-sidebar            sticky sidebar
- *   50  .race-suggest           autocomplete dropdown
- *   60  .mycard.suggest-open    card raised while its dropdown is open
- *   90  .topbar                 main navbar
- *   95  .settings-panel
- *   96  .cal-trainee-panel
- *   97  .cal-sidebar.panel-open
- *  200  .carotene-panel
- *  200  .modal-overlay
- * 1000  #tooltip
- * ------------------------------------------------------------------ */
+
 
 :root {
   --bg: #0d0f14;
@@ -28,9 +15,7 @@
   --accent2: #2bcfa8;
   --accent-rgb: 34, 181, 115;
   --accent2-rgb: 43, 207, 168;
-  /* Carrot mark for the Carotene panel and the rail button. Mirrors the hub's
-     own tokens, light pair included, so the mark matches the landing page in
-     either theme. */
+  
   --carrot: #e8873a;
   --carrot-leaf: #22b573;
   --glass-bg: rgba(23, 26, 34, .72);
@@ -82,7 +67,7 @@ body.light {
   --accent2: #187560;
   --accent-rgb: 24, 122, 77;
   --accent2-rgb: 24, 117, 96;
-  /* Light pair, as on the hub: the deep orange clears 3:1 on light chrome. */
+  
   --carrot: #c2651c;
   --carrot-leaf: #187a4d;
   --glass-bg: var(--bg-alt);
@@ -197,8 +182,7 @@ body.nav-top .topbar {
   -webkit-backdrop-filter: none;
   border-top: 0;
   border-bottom: 0;
-  /* S1: match desktop's 10px vertical so the pill height stays stable
-     across the 960px breakpoint. */
+  
   padding: 10px 0;
   margin-top: 0;
   position: fixed;
@@ -215,8 +199,7 @@ body.nav-top .topbar {
   justify-content: space-between;
   gap: 12px;
 }
-/* Topbar: 3-section "dock". All three sections share pill chrome
-   (padding + border + radius + glass background) so they read as siblings. */
+
 .topbar-inner > .brand,
 .topbar-inner > .topbar-actions,
 .topbar-inner > .carotene-wrap {
@@ -226,8 +209,7 @@ body.nav-top .topbar {
   gap: 6px;
   padding: 4px;
   border: 1px solid transparent;
-  /* Nested-radius formula: outer = inner button radius + padding.
-     Buttons use 12px → container uses 12 + 4 = 16px. */
+  
   border-radius: 16px;
   box-sizing: border-box;
 }
@@ -352,7 +334,7 @@ body.light .brand-check {
   gap: 10px;
   overflow: hidden;
   white-space: nowrap;
-  /* Rounder square. 12 + 4 (container padding) = 16 = container radius. */
+  
   border-radius: 12px;
   transition: box-shadow .15s ease, border-color .15s ease, color .15s ease, background-color .15s ease, transform .15s ease;
 }
@@ -419,7 +401,7 @@ body.nav-top .settings-panel {
 body.nav-top .settings-panel.show {
   transform: translateY(0) scale(1);
 }
-/* M4/N1: keep sticky calendar chrome below the fixed topbar regardless of viewport. */
+
 body.nav-top .cal-tabs-main,
 body.nav-top .cal-sidebar {
   top: calc(var(--topbar-h, 70px) + 20px);
@@ -447,7 +429,6 @@ body.nav-top .cal-sidebar {
   display: block;
 }
 
-/* --- panel contents: a mini landing page --- */
 .carotene-panel-brand {
   display: flex;
   align-items: center;
@@ -468,12 +449,7 @@ body.nav-top .cal-sidebar {
   width: 22px;
   height: 22px;
 }
-/* The carrot matches the hub's, in whichever theme is active - the hub
-   carries the same light/dark pair, so the two agree everywhere. Light needs
-   the deeper orange or the mark drops to 2.4:1 on the light chrome, below the
-   3:1 floor for a graphical object. :focus-visible is included so keyboard
-   users get the same affordance hover gives. The unfocused, unhovered rail
-   button still inherits currentColor and is left exactly as it was. */
+
 .carotene-panel-mark .carrot-body,
 #carotene-btn:hover .carrot-body,
 #carotene-btn:focus-visible .carrot-body,
@@ -483,8 +459,6 @@ body.nav-top .cal-sidebar {
 #carotene-btn:focus-visible .carrot-leaf,
 #carotene-btn[aria-expanded="true"] .carrot-leaf { stroke: var(--carrot-leaf); }
 
-/* Eases the swap in time with the button's own hover transitions. The global
-   reduced-motion block already collapses this. */
 #carotene-btn .carrot-body,
 #carotene-btn .carrot-leaf { transition: stroke .15s ease; }
 .carotene-panel-name {
@@ -492,26 +466,13 @@ body.nav-top .cal-sidebar {
   font-size: 15px;
   letter-spacing: .01em;
 }
-/* Status badge, set on the baseline rather than raised as a superscript.
-   It lives inside the name span rather than beside it because the brand
-   link is a flex container, where a bare child would become a flex item and
-   lose its flow with the text. The explicit vertical-align: baseline is
-   load-bearing: the element is a <sup>, and the UA stylesheet raises those
-   on its own, so removing our own declaration is not enough.
-   line-height is 1, not the inherited 1.5 - a badge is a chip, and the
-   extra leading is what pushed the box past the title's cap height.
-   inline-flex + align-items centres the label in the chip: with a 1em line
-   box the glyphs sit slightly high inside it, and padding alone cannot
-   correct that on both edges at once. */
+
 .carotene-panel-beta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   margin-left: .3em;
-  /* Asymmetric on purpose, leaning the label UP. "Beta" has no descenders, so
-     the font reserves descent these glyphs never use, which parks the ink
-     below the middle of its line box. More space below than above lifts it
-     back; the pair still sums to .4em, so the chip keeps its height. */
+  
   padding: calc(.2em - .5px) .5em calc(.2em + .5px);
   border: 1px solid var(--line);
   border-radius: 5px;
@@ -523,12 +484,7 @@ body.nav-top .cal-sidebar {
   letter-spacing: .04em;
   vertical-align: baseline;
   white-space: nowrap;
-  /* Baseline alignment puts the label's baseline on the title's, but the
-     title's ink is 12px tall (cap height, no descenders) while the badge's
-     is only 7px - so a box centred on the badge's ink hangs 2.5px below the
-     middle of the wordmark, plus 0.5px from the asymmetric padding above.
-     Lifting by 3px lands the chip on the title's cap height. Transform, not
-     a vertical-align length, so it cannot disturb the line box. */
+  
   transform: translateY(-3px);
 }
 .carotene-panel-list {
@@ -540,7 +496,7 @@ body.nav-top .cal-sidebar {
   justify-content: center;
   gap: 10px;
 }
-/* Square tiles, as on the landing page. */
+
 .carotene-panel-item {
   display: flex;
   flex-direction: column;
@@ -558,7 +514,7 @@ body.nav-top .cal-sidebar {
   text-align: center;
   color: var(--ink-dim);
 }
-/* The tool you are already using: marked, never linked. */
+
 .carotene-panel-item.is-current {
   background: color-mix(in srgb, var(--accent) 12%, transparent);
   border-color: color-mix(in srgb, var(--accent) 55%, transparent);
@@ -590,7 +546,7 @@ body.light .carotene-panel-item-mark-amber {
   height: 100%;
   display: block;
 }
-/* No icon yet for the unbuilt tool, so the slot reads as empty on purpose. */
+
 .carotene-panel-item.is-soon .carotene-panel-item-mark {
   border: 1.5px dashed var(--line);
   border-radius: 6px;
@@ -843,13 +799,13 @@ section.block {
   color: var(--ink-dim);
   margin-left: auto;
 }
-/* Inline SVG sized to surrounding text (e.g. calendar glyph in labels). */
+
 .text-icon {
   width: 1em;
   height: 1em;
   vertical-align: -0.15em;
 }
-/* Toggle-button glyph matches the chevron affordance next to it. */
+
 .inline-cal-toggle .text-icon {
   width: 1.5em;
   height: 1.5em;
@@ -1178,8 +1134,7 @@ body.light .focus-line.clear {
   flex-shrink: 0;
   margin: 0;
 }
-/* Only the race-name span (the first direct span sibling) gets the
-   completed look. Mini-tags, dates, and icons stay crisp. */
+
 .trophy-item.checked > span:first-of-type {
   text-decoration: line-through;
   color: var(--ink-dim);
@@ -1699,7 +1654,7 @@ body.light .toast {
 .cal-race-row:focus-within .cal-race-moves {
   opacity: 1;
 }
-/* Touch has no hover: keep reorder buttons visible (2-col grid has room). */
+
 @media (hover: none) {
   .cal-race-moves {
     opacity: 1;
@@ -1984,10 +1939,7 @@ body.light .cal-race-add-btn:hover {
   position: fixed;
   inset: 0;
   background: rgba(5, 6, 9, .6);
-  /* Blur the page behind the dialog, so it matches the Carotene hub's About
-     popup. Purely an enhancement over the scrim above, which already dims on
-     its own — so unlike .modal-box this needs no @supports fallback: where
-     backdrop-filter is unsupported the dialog just reads a little crisper. */
+  
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
   z-index: 200;
@@ -2220,9 +2172,7 @@ body.light .cal-race-add-btn:hover {
 #kao-banner:empty {
   display: none;
 }
-/* Campaign banner keeps its own link presentation: hardcoded white,
-   immune to app themes and accent changes. ID scope + !important
-   outranks both the banner's plain rules and .about-text a. */
+
 #kao-banner .kao-banner a,
 #kao-banner .kao-banner a:visited {
   color: #fff !important;
@@ -2349,13 +2299,7 @@ body.light .cal-race-add-btn:hover {
   body.nav-left .settings-panel.show {
     transform: translateX(0) scale(1);
   }
-  /* The rail button sits ~36px off the bottom edge, so centring a tall panel
-     on it always overhung the viewport. Anchoring the panel's BOTTOM means it
-     grows upward instead, which stays on screen at any viewport height.
-     The anchor is the button's bottom edge rather than its midline: the
-     button is 42px tall and centred in a wrap with 4px padding + 1px border,
-     so its bottom sits 5px above the wrap's border-box bottom, and 4px above
-     the padding-box bottom that `bottom` is measured from. */
+  
   body.nav-right .carotene-panel {
     right: calc(100% + 8px);
     bottom: 4px;
@@ -2383,8 +2327,7 @@ body.light .cal-race-add-btn:hover {
     padding-left: 0;
     padding-right: 0;
   }
-  /* B1: track the measured topbar height instead of hardcoding 78px, so
-     body padding exactly matches the bar (padding + pill + padding). */
+  
   body.nav-bottom { padding-bottom: calc(var(--topbar-h, 70px) + env(safe-area-inset-bottom)); }
   body.nav-top    { padding-top:    calc(var(--topbar-h, 70px) + env(safe-area-inset-top)); }
   body.nav-bottom .topbar,
@@ -2392,7 +2335,7 @@ body.light .cal-race-add-btn:hover {
     right: 0;
     left: 0;
     width: auto;
-    /* height removed — let it size to content */
+    
     padding: 10px 18px;
     border-right: 0;
     border-left: 0;

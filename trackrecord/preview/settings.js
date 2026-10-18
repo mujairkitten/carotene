@@ -14,21 +14,16 @@ function activeNavbarPosition() {
     : state.settings.navbarPositionMobile;
 }
 
-/* ---------- Topbar sizing ---------- */
-
 export function syncTopbarHeight() {
   const topbar = document.querySelector('.topbar');
   if (!topbar) return;
-  // In left/right mode the bar is a full-height rail — measuring it would
-  // push --topbar-h consumers (toast offset) off-screen. Measure the pill.
+
   const vertical = document.body.classList.contains('nav-left')
     || document.body.classList.contains('nav-right');
   const target = (vertical ? topbar.querySelector('.topbar-actions') : null) || topbar;
   const height = target.getBoundingClientRect().height;
   document.documentElement.style.setProperty('--topbar-h', `${height}px`);
 }
-
-/* ---------- Buttons ---------- */
 
 function updateRailViewButton() {
   const button = document.getElementById('rail-view-btn');
@@ -63,9 +58,6 @@ function refreshNavPositionButtons() {
   });
 }
 
-/* ---------- Settings UI ---------- */
-
-// N8: close the settings popover when focus leaves it (keyboard tab-out).
 const settingsPanelDismissWired = new WeakSet();
 function wireSettingsPanelDismiss(panel) {
   if (!panel || settingsPanelDismissWired.has(panel)) return;
@@ -113,9 +105,6 @@ export function applySettingsUI() {
   applyNavbarPosition();
 }
 
-// Reflects the current viewport's stored position onto the body, and
-// syncs the 4-button group's active/disabled state. Safe to call on
-// resize — it never writes state.
 export function applyNavbarPosition() {
   const pos = activeNavbarPosition();
   document.body.classList.remove('nav-left', 'nav-bottom', 'nav-right', 'nav-top');
@@ -191,8 +180,6 @@ export function setNavbarPosition(pos) {
   announce(`Navbar ${pos}.`);
 }
 
-/* ---------- Modal focus management ---------- */
-
 const modalFocusStack = [];
 
 function focusablesIn(container) {
@@ -211,8 +198,7 @@ function onModalKeydown(e) {
   const overlay = e.currentTarget;
   if (e.key === 'Escape') {
     e.stopPropagation();
-    // Route through the specific closers so per-modal teardown runs
-    // (closeBackupModal clears the export-cooldown interval).
+
     if (overlay.id === 'backup-overlay') closeBackupModal();
     else if (overlay.id === 'about-overlay') closeAboutModal();
     else closeModal(overlay);
@@ -232,8 +218,7 @@ function onModalKeydown(e) {
 
 function openModal(overlay, returnFocusEl) {
   if (!overlay || overlay.classList.contains('show')) return;
-  // returnFocusEl lets callers capture the opener before they hide/inert it
-  // (e.g. openAboutModal closes the settings panel first).
+
   modalFocusStack.push(returnFocusEl || document.activeElement);
   overlay.classList.add('show');
   overlay.addEventListener('keydown', onModalKeydown);
@@ -248,9 +233,7 @@ function closeModal(overlay) {
   overlay.removeEventListener('keydown', onModalKeydown);
   const prev = modalFocusStack.pop();
   if (document.querySelectorAll('.modal-overlay.show').length === 0) setBackgroundInert(false);
-  // The recorded opener may have become unfocusable while the modal was open
-  // (e.g. it lives inside the now-inert settings panel) — fall back to a
-  // sensible control instead of dropping focus to <body>.
+
   let target = (prev && prev.isConnected && !prev.closest('[inert]')) ? prev : null;
   if (!target) {
     if (overlay.id === 'about-overlay') target = document.getElementById('settings-btn');
@@ -261,10 +244,8 @@ function closeModal(overlay) {
   }
 }
 
-/* ---------- About modal ---------- */
-
 export function openAboutModal() {
-  // Capture the opener before closeSettingsPanel() inerts it.
+
   const opener = document.activeElement;
   closeSettingsPanel();
   openModal(document.getElementById('about-overlay'), opener);
@@ -272,8 +253,6 @@ export function openAboutModal() {
 export function closeAboutModal() {
   closeModal(document.getElementById('about-overlay'));
 }
-
-/* ---------- Backup modal ---------- */
 
 function backupFilename() {
   const d = new Date();
@@ -302,7 +281,6 @@ function importListFromText(text) {
     const parsed = JSON.parse(text);
     if (!parsed || !Array.isArray(parsed.myList)) throw new Error("bad format");
 
-    // Slice the RAW array first so a bloated payload burns no normalize CPU.
     const rawList = parsed.myList.slice(0, MAX_IMPORT_TRAINEES);
     const knownNames = new Set(state.myList.map(t => traineeNameKey(t.name)));
     const incoming = normalizeImportedTrainees(rawList, state.myList).filter(t => {
@@ -312,7 +290,7 @@ function importListFromText(text) {
       return true;
     });
     const room = Math.max(0, MAX_MY_LIST - state.myList.length);
-    // Total-trophy budget: trim trailing trophies instead of importing 150k.
+
     let budget = MAX_IMPORT_TROPHIES;
     let trimmedTrophies = 0;
     const accepted = [];
@@ -328,7 +306,7 @@ function importListFromText(text) {
     state.myList.push(...accepted);
 
     if (parsed.settings && typeof parsed.settings === 'object') {
-      // Keep local UI prefs (theme, navbar); only functional settings cross over.
+
       const keep = {
         lightMode: state.settings.lightMode,
         colorTheme: state.settings.colorTheme,

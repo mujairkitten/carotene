@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Track Record - Track character aptitudes, distances, and trophy ledger for trainees.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; worker-src 'none'">
-  <!-- Note: the KAO countdown banner is vendored locally (../kao-banner.js), so
-       script-src needs no third-party host. frame-ancestors is ignored in
-       <meta> CSP per spec; hosting must also send it as an HTTP header. -->
+  
   <title>Track Record</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -153,9 +151,7 @@
     <div class="rail-item-wrap carotene-wrap">
       <button class="btn rail-action" id="carotene-btn" type="button" aria-label="Carotene" data-tooltip="Carotene" aria-expanded="false" aria-controls="carotene-panel">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-          <!-- Unfocused, these inherit currentColor from the svg above. The
-               focused (panel open) colours come from CSS keyed off
-               aria-expanded, so the closed state is left untouched. -->
+          
           <g transform="rotate(45 12 12)">
             <path class="carrot-body" d="M12 21C10.5 17 9 13.4 9 10.3C9 7.7 10.3 6.1 12 6.1C13.7 6.1 15 7.7 15 10.3C15 13.4 13.5 17 12 21Z" stroke-width="1.8"/>
             <path class="carrot-leaf" d="M12 6.3C11 4.9 10 4.3 8.6 3.9" stroke-width="1.5"/>
@@ -164,10 +160,7 @@
           </g>
         </svg>
       </button>
-      <!-- Mini landing page. The brand links up to the Carotene hub, which is
-           two levels above this build (../../ from trackrecord/preview/,
-           ../ from trackrecord/). The current tool is marked, not linked:
-           you are already there. -->
+      
       <div class="carotene-panel" id="carotene-panel" role="region" aria-label="Carotene" aria-hidden="true">
         <a class="carotene-panel-brand" href="../../">
           <svg class="carotene-panel-mark" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" stroke-linecap="round" stroke-linejoin="round">
